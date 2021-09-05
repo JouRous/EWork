@@ -30,7 +30,7 @@ namespace Api
           opt.AddPolicy(name: _policyName, builder =>
           {
             builder
-              .WithOrigins("http://localhost:8080")
+              .WithOrigins("http://localhost:3000")
               // .AllowAnyOrigin()
               .AllowAnyHeader()
               .AllowAnyMethod();

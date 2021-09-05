@@ -29,5 +29,21 @@ export const routes: IRoute[] = [
     exact: false,
     fallback: <div>...</div>,
     component: lazy(() => import('../pages/auth')),
+    routes: [
+      {
+        path: '/auth/login',
+        exact: false,
+        fallback: <div>...</div>,
+        component: lazy(() => import('../pages/auth/Login')),
+        private: false,
+      },
+      {
+        path: '/auth/register',
+        exact: false,
+        fallback: <div>...</div>,
+        component: lazy(() => import('../pages/auth/Register')),
+        private: false,
+      },
+    ],
   },
 ];
