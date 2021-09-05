@@ -1,0 +1,50 @@
+version: '3.4'
+
+services:
+  eworkdb:
+    container_name: qtaskdb
+    image: mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: 'root'
+      MONGO_INITDB_ROOT_PASSWORD: '123123'
+    networks:
+      - my-network
+  api:
+    container_name: app_api
+    build:
+      context: ./App
+      dockerfile: Api/Dockerfile
+    restart: unless-stopped
+    environment:
+      - 'ConnectionStrings:Default=mongodb://root:123123@eworkdb:27017/'
+    networks:
+      - my-network
+    depends_on:
+      - qtaskdb
+
+  nginx:
+    container_name: nginx
+    build:
+      context: ./nginx
+    depends_on:
+      - api
+    networks:
+      - my-network
+
+  portainer:
+    image: portainer/portainer-ce
+    restart: always
+    ports:
+      - 8000:8000
+      - 9000:9000
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - portainer_data:/data
+
+volumes:
+  app-data:
+  portainer_data:
+  pgadmin_data:
+networks:
+  my-network:

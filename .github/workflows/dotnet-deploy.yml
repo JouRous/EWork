@@ -1,0 +1,33 @@
+name: Deploy Dotnet
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  COMPOSE_DOCKER_CLI_BUILD: 0
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          command_timeout: 45m
+          script: |
+            cd ~/projects/QTask-be
+            git fetch && git pull
+            export COMPOSE_DOCKER_CLI_BUILD=0
+            docker-compose -f docker-compose.yml -f docker-compose.prod.yml build --parallel
+            docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+          debug: true
