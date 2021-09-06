@@ -1,9 +1,10 @@
 import { FC } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link, Redirect } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { IUser } from '../../models/user';
 import { loginAction } from '../../store/features/auth/asyncActions';
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { useAppDispatch } from '../../store/hooks';
 
 const Wrapper = styled.section`
   display: block;
@@ -39,14 +40,15 @@ const SubmitButton = styled.button`
   cursor: default;
 `;
 
-const Login: FC<any> = () => {
+interface IProps {
+  user: IUser;
+}
+
+const Login: FC<IProps> = ({ user }) => {
   const { register, handleSubmit } = useForm();
   const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.auth.user);
 
-  return user ? (
-    <Redirect to="/" />
-  ) : (
+  return (
     <Wrapper>
       <h1
         style={{ color: '#5E6C84' }}

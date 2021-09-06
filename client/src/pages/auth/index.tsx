@@ -3,6 +3,7 @@ import { useHistory } from 'react-router';
 import AuthBackground from '../../components/AuthBackground';
 import { IRoute } from '../../router/config';
 import Router from '../../router/Router';
+import { useAppSelector } from '../../store/hooks';
 
 interface IProps {
   routes: IRoute[];
@@ -10,10 +11,15 @@ interface IProps {
 
 const Auth: FC<IProps> = ({ routes }) => {
   const history = useHistory();
+  const user = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    history.push('/auth/login');
-  }, [history]);
+    if (user) {
+      history.push('/');
+    } else {
+      history.push('/auth/login');
+    }
+  }, [history, user]);
 
   return (
     <div className="relative">
