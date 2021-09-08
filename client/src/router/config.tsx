@@ -21,8 +21,8 @@ export const routes: IRoute[] = [
     path: '/_/workspace',
     exact: false,
     fallback: <div>...</div>,
-    component: lazy(() => import('../pages/HomePage')),
-    private: false,
+    component: lazy(() => import('../pages/home')),
+    private: true,
   },
   {
     path: '/auth',

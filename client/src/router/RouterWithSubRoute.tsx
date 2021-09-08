@@ -1,9 +1,12 @@
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 import { Redirect, Route } from 'react-router-dom';
+import { useAppSelector } from '../store/hooks';
 import { IRoute } from './config';
 
 const RouteWithSubRoutes = (route: IRoute) => {
-  const authenticated: boolean = true;
+  const isAuthenticated = useAppSelector((state) => state.auth.user)
+    ? true
+    : false;
 
   return (
     <Suspense fallback={route.fallback}>
@@ -13,7 +16,7 @@ const RouteWithSubRoutes = (route: IRoute) => {
           route.redirect ? (
             <Redirect to={route.redirect} />
           ) : route.private ? (
-            authenticated ? (
+            isAuthenticated ? (
               route.component && (
                 <route.component {...props} routes={route.routes} />
               )

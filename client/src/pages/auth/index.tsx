@@ -11,7 +11,7 @@ interface IProps {
 
 const Auth: FC<IProps> = ({ routes }) => {
   const history = useHistory();
-  const user = useAppSelector((state) => state.auth);
+  const user = useAppSelector((state) => state.auth.user);
 
   useEffect(() => {
     if (user) {

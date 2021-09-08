@@ -1,5 +1,5 @@
-import { ReactComponent as AuthLeftBG } from '../assets/backgrounds/auth-left-bg.svg';
-import { ReactComponent as AuthRightBG } from '../assets/backgrounds/auth-righ-bg.svg';
+import { ReactComponent as AuthLeftBG } from 'assets/backgrounds/auth-left-bg.svg';
+import { ReactComponent as AuthRightBG } from 'assets/backgrounds/auth-righ-bg.svg';
 
 const AuthBackground = () => {
   return (

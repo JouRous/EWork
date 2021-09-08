@@ -6,7 +6,7 @@ namespace Abstractions.ViewModels
 {
   public class CreateProjectParams
   {
-    public string Title { get; set; }
+    public string Name { get; set; }
     public string ShortDescription { get; set; }
     public ICollection<Guid> UserIds { get; set; }
     public IFormFile ImageUrl { get; set; }
