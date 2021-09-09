@@ -17,11 +17,11 @@ namespace Api.Controllers
     private readonly ITokenService _tokenService;
     private readonly IMapper _mapper;
     private readonly IEmailService _emailService;
-    private readonly IIRepository<User> _userRepository;
+    private readonly IMongoRepository<User> _userRepository;
 
     public AuthController(
         IMapper mapper,
-        IIRepository<User> userRepository,
+        IMongoRepository<User> userRepository,
         ITokenService tokenService,
         IEmailService emailService)
     {

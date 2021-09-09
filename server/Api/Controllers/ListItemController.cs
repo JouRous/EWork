@@ -12,11 +12,11 @@ namespace Api.Controllers
 {
   public class ListItemController : BaseController
   {
-    private readonly IIRepository<ListItem> _listRepository;
-    private readonly IIRepository<Ticket> _ticketRepository;
+    private readonly IMongoRepository<ListItem> _listRepository;
+    private readonly IMongoRepository<Ticket> _ticketRepository;
     private readonly IMapper _mapper;
 
-    public ListItemController(IIRepository<ListItem> listRepository, IIRepository<Ticket> ticketRepository, IMapper mapper)
+    public ListItemController(IMongoRepository<ListItem> listRepository, IMongoRepository<Ticket> ticketRepository, IMapper mapper)
     {
       _listRepository = listRepository;
       _ticketRepository = ticketRepository;

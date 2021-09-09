@@ -9,7 +9,7 @@ namespace Infrastructure
   {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration config)
     {
-      services.AddScoped(typeof(IIRepository<>), typeof(Repository<>));
+      services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
 
       return services;
     }

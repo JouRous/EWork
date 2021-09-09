@@ -10,8 +10,8 @@ namespace Abstractions.Entities
   {
     public string Name { get; set; }
     public string ImageUrl { get; set; }
-    // public string ImageId { get; set; }
-
+    public string ImageId { get; set; }
+    public Guid Creator { get; set; }
     public List<Board> Boards { get; set; }
     public ICollection<User> Users { get; set; }
     public ICollection<Guid> UserIds { get; set; }

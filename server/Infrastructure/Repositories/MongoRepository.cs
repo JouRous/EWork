@@ -12,11 +12,11 @@ using MongoDB.Driver.Linq;
 
 namespace Infrastructure.Repositories
 {
-  public class Repository<TDocument> : IIRepository<TDocument> where TDocument : BaseEntity
+  public class MongoRepository<TDocument> : IMongoRepository<TDocument> where TDocument : BaseEntity
   {
     private readonly IMongoCollection<TDocument> _collection;
 
-    public Repository(IConfiguration configuration)
+    public MongoRepository(IConfiguration configuration)
     {
       var database = new MongoClient(configuration.GetConnectionString("Default")).GetDatabase("EWork");
       _collection = database.GetCollection<TDocument>(GetCollectionName(typeof(TDocument)));

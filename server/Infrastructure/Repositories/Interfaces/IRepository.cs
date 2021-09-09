@@ -9,7 +9,7 @@ using MongoDB.Driver.Linq;
 
 namespace Infrastructure.Data.Interfaces
 {
-  public interface IIRepository<TDocument> where TDocument : BaseEntity
+  public interface IMongoRepository<TDocument> where TDocument : BaseEntity
   {
     IMongoQueryable<TDocument> AsQueryable();
     IAggregateFluent<TDocument> AsAggregate();

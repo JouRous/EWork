@@ -25,7 +25,7 @@ namespace Api.Middleware
       _logger = logger;
     }
 
-    public async Task Invoke(HttpContext context, IIRepository<User> repository)
+    public async Task Invoke(HttpContext context, IMongoRepository<User> repository)
     {
       var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
@@ -37,7 +37,7 @@ namespace Api.Middleware
       await _next(context);
     }
 
-    public async Task attachUserToContext(HttpContext context, IIRepository<User> repository, string token)
+    public async Task attachUserToContext(HttpContext context, IMongoRepository<User> repository, string token)
     {
       try
       {
@@ -55,8 +55,22 @@ namespace Api.Middleware
 
         var jwtToken = (JwtSecurityToken)validatedToken;
         var userId = jwtToken.Claims.First(x => x.Type == "UserId").Value;
+        var user = new User();
+        try
+        {
+          user = await repository.FindByIdAsync(new Guid(userId));
+        }
+        catch (Exception ex)
+        {
+          _logger.LogError(ex.Message);
+          context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+          await context.Response.WriteAsJsonAsync(new
+          {
+            statusCode = 500,
+            message = "Internal server error"
+          });
+        };
 
-        var user = await repository.FindByIdAsync(new Guid(userId));
         context.Items["User"] = user;
       }
       catch (Exception ex)

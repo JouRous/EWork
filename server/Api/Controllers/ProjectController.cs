@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Abstractions.Entities;
 using Abstractions.ViewModels;
+using Api.Middleware;
 using Application.Services.Interfaces;
 using AutoMapper;
 using Infrastructure.Data.Interfaces;
@@ -12,19 +13,20 @@ using MongoDB.Driver.Linq;
 
 namespace Api.Controllers
 {
+  [AuthorizeAttribute]
   public class ProjectController : BaseController
   {
-    private readonly IIRepository<Project> _projectRepository;
-    private readonly IIRepository<Board> _boardRepository;
-    private readonly IIRepository<ListItem> _listRepository;
-    private readonly IIRepository<Ticket> _ticketRepository;
+    private readonly IMongoRepository<Project> _projectRepository;
+    private readonly IMongoRepository<Board> _boardRepository;
+    private readonly IMongoRepository<ListItem> _listRepository;
+    private readonly IMongoRepository<Ticket> _ticketRepository;
     private readonly ICloudinaryService _cloudinaryService;
     private readonly IMapper _mapper;
     public ProjectController(
-        IIRepository<Project> projectRepository,
-        IIRepository<Board> boardRepository,
-        IIRepository<ListItem> listRepository,
-        IIRepository<Ticket> ticketRepository,
+        IMongoRepository<Project> projectRepository,
+        IMongoRepository<Board> boardRepository,
+        IMongoRepository<ListItem> listRepository,
+        IMongoRepository<Ticket> ticketRepository,
         ICloudinaryService cloudinaryService,
         IMapper mapper)
     {
@@ -34,11 +36,14 @@ namespace Api.Controllers
       _ticketRepository = ticketRepository;
       _cloudinaryService = cloudinaryService;
       _mapper = mapper;
+
     }
 
     [HttpGet]
     public async Task<ActionResult> GetAll()
     {
+      var user = (User)HttpContext.Items["User"];
+
       var projects = await _projectRepository.AsQueryable().ToListAsync();
       return Ok(_mapper.Map<IEnumerable<ProjectGetResult>>(projects));
     }

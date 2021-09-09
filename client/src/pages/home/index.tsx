@@ -23,7 +23,7 @@ const HomePage: FC<IProps> = () => {
     }
 
     fetchApi();
-  }, [projects]);
+  }, []);
 
   return (
     <HomeContainer className="flex items-start justify-center">
