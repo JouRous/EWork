@@ -11,7 +11,7 @@ namespace Api
 {
   public class Program
   {
-    public static async Task Main(string[] args)
+    public static void Main(string[] args)
     {
       var host = CreateHostBuilder(args).Build();
 
@@ -22,7 +22,7 @@ namespace Api
       try
       {
         var dbContext = services.GetRequiredService<AppDbContext>();
-        await dbContext.Database.MigrateAsync();
+        dbContext.Database.Migrate();
       }
       catch (Exception ex)
       {

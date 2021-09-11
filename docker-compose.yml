@@ -11,7 +11,7 @@ services:
     networks:
       - my-network
 
-  eworkdb-postgresql:
+  eworkdb2:
     container_name: eworkdb-postgresql
     image: postgres
     environment:
@@ -19,8 +19,12 @@ services:
       POSTGRES_PASSWORD: '123123'
       PGDATA: '/var/lib/postgresql/data'
     restart: unless-stopped
+    ports:
+      - 5432:5432
     volumes:
       - eworkdb-postgresql-volume:/var/lib/postgresql/data
+    networks:
+      - my-network
 
   api:
     container_name: app_api
@@ -30,7 +34,7 @@ services:
     restart: unless-stopped
     environment:
       - 'ConnectionStrings:Default=mongodb://root:123123@eworkdb:27017/'
-      - 'ConnectionStrings:Postgresql=Server=eworkdb-postgresql; Port=5432; User Id=postgres; Password=123123; Database=EWork'
+      - 'ConnectionStrings:Postgresql=Server=eworkdb2; Port=5432; User Id=postgres; Password=123123; Database=EWork'
     networks:
       - my-network
     depends_on:
