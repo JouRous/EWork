@@ -39,7 +39,7 @@ services:
       - my-network
     depends_on:
       - eworkdb
-      - eworkdb-postgresql
+      - eworkdb2
 
   web:
     container_name: app_web
