@@ -1,4 +1,3 @@
-using System;
 using Api.Data;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +10,10 @@ namespace Api.Extensions
   {
     public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration configuration)
     {
-      var connString = configuration.GetConnectionString("SqlServer");
+      var connString = configuration.GetConnectionString("Postgresql");
       services.AddDbContext<AppDbContext>(options =>
       {
-        options.UseSqlServer(connString);
+        options.UseNpgsql(connString);
       });
 
       services.AddScoped(typeof(IRepository<>), typeof(Repository<>));

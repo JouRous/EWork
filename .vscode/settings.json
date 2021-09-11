@@ -3,6 +3,7 @@
   "cSpell.words": [
     "Bson",
     "Cloudinary",
+    "Npgsql",
     "persistor"
   ]
 }
