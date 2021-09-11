@@ -1,5 +1,7 @@
 import { FC } from 'react';
-import { Link } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { Link, useHistory } from 'react-router-dom';
+import http from 'services/http-service';
 import styled from 'styled-components';
 
 const Wrapper = styled.section`
@@ -37,6 +39,9 @@ const SubmitButton = styled.button`
 `;
 
 const Register: FC<any> = () => {
+  const { register, handleSubmit } = useForm();
+  const history = useHistory();
+
   return (
     <Wrapper>
       <h1
@@ -47,10 +52,16 @@ const Register: FC<any> = () => {
       </h1>
       <div className="form">
         <div>
-          <InputText className="px-2" placeholder="Enter Email" type="text" />
+          <InputText
+            {...register('email')}
+            className="px-2"
+            placeholder="Enter Email"
+            type="email"
+          />
         </div>
         <div>
           <InputText
+            {...register('username')}
             className="px-2"
             placeholder="Enter Username"
             type="text"
@@ -58,6 +69,7 @@ const Register: FC<any> = () => {
         </div>
         <div>
           <InputText
+            {...register('password')}
             className="px-2"
             placeholder="Enter Password"
             type="password"
@@ -68,7 +80,19 @@ const Register: FC<any> = () => {
           Service and Privacy Policy.
         </p>
         <div>
-          <SubmitButton className="text-center w-full py-2 font-bold">
+          <SubmitButton
+            onClick={handleSubmit((data) => {
+              http.post('/api/v1/auth/register', data).subscribe(
+                (response) => {
+                  history.push('/auth/login');
+                },
+                (error) => {
+                  console.log(error);
+                }
+              );
+            })}
+            className="text-center w-full py-2 font-bold"
+          >
             Continue
           </SubmitButton>
         </div>

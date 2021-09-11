@@ -1,84 +1,158 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Abstractions.Entities;
+using Abstractions.Exceptions;
 using Abstractions.ViewModels;
 using Api.Middleware;
 using Application.Services.Interfaces;
 using AutoMapper;
-using Infrastructure.Data.Interfaces;
+using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
-using MongoDB.Driver.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.Controllers
 {
   [AuthorizeAttribute]
   public class ProjectController : BaseController
   {
-    private readonly IMongoRepository<Project> _projectRepository;
-    private readonly IMongoRepository<Board> _boardRepository;
-    private readonly IMongoRepository<ListItem> _listRepository;
-    private readonly IMongoRepository<Ticket> _ticketRepository;
+    private readonly IRepository<Project> _projectRepository;
     private readonly ICloudinaryService _cloudinaryService;
     private readonly IMapper _mapper;
     public ProjectController(
-        IMongoRepository<Project> projectRepository,
-        IMongoRepository<Board> boardRepository,
-        IMongoRepository<ListItem> listRepository,
-        IMongoRepository<Ticket> ticketRepository,
+        IRepository<Project> projectRepository,
         ICloudinaryService cloudinaryService,
         IMapper mapper)
     {
       _projectRepository = projectRepository;
-      _boardRepository = boardRepository;
-      _listRepository = listRepository;
-      _ticketRepository = ticketRepository;
       _cloudinaryService = cloudinaryService;
       _mapper = mapper;
+    }
 
+    private User GetUserFromContext()
+    {
+      return (User)HttpContext.Items["User"];
     }
 
     [HttpGet]
     public async Task<ActionResult> GetAll()
     {
-      var user = (User)HttpContext.Items["User"];
+      var user = GetUserFromContext();
 
-      var projects = await _projectRepository.AsQueryable().ToListAsync();
-      return Ok(_mapper.Map<IEnumerable<ProjectGetResult>>(projects));
+      var projects = await _projectRepository.Query(p => p.Creator == user.Id).ToListAsync();
+      return Ok(projects);
+    }
+
+    [HttpGet("guest")]
+    public async Task<ActionResult> GetGuestProject()
+    {
+      var user = GetUserFromContext();
+
+      var projects = await _projectRepository.Query()
+        .Where(p => p.Creator != user.Id)
+        .Where(p => p.UserProjects.Any(x => x.UserId == user.Id))
+        .ToListAsync();
+
+      return Ok(projects);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult> GetById(Guid id)
     {
-      var project = await _projectRepository.FindOneAsync(p => p.Id == id);
+      var project = await _projectRepository.FirstOrDefaultAsync(id);
       return Ok(project);
     }
 
     [HttpGet("{id}/boards")]
     public async Task<ActionResult> GetBoardByProjectId(Guid id)
     {
-      var projects = await _projectRepository.AsAggregate()
-        .Lookup("Boards", "_id", "ProjectId", "ListBoards")
-        .As<ProjectGetResult>()
+      var projects = await _projectRepository.Query()
+        .Where(p => p.Id == id)
+        .Include(p => p.Boards)
         .ToListAsync();
 
       return Ok(projects);
     }
 
     [HttpPost]
-    public async Task<ActionResult> CreateProject([FromForm] CreateProjectParams createProjectParams)
+    public async Task<ActionResult> CreateProject(CreateProjectParams createProjectParams)
     {
+      var user = (User)HttpContext.Items["User"];
       var project = _mapper.Map<Project>(createProjectParams);
 
-      if (createProjectParams.ImageUrl != null)
+      project.Creator = user.Id;
+
+      project.UserProjects.Add(new UserProject
       {
-        var result = await _cloudinaryService.UploadImageAsync(createProjectParams.ImageUrl);
-        // project.ImageId = result.PublicId;
-        project.ImageUrl = result.SecureUrl.AbsoluteUri;
+        UserId = user.Id
+      });
+
+      // if (createProjectParams.ImageUrl != null)
+      // {
+      //   var result = await _cloudinaryService.UploadImageAsync(createProjectParams.ImageUrl);
+      //   // project.ImageId = result.PublicId;
+      //   project.ImageUrl = result.SecureUrl.AbsoluteUri;
+      // }
+
+      var tran = _projectRepository.BeginTransaction();
+
+      try
+      {
+        _projectRepository.Add(project);
+        await _projectRepository.SaveChangesAsync();
+
+        await tran.CommitAsync();
+      }
+      catch (System.Exception)
+      {
+        await tran.RollbackAsync();
+        return BadRequest();
       }
 
-      await _projectRepository.InsertOneAsync(project);
+      return Ok(new
+      {
+        StatusCode = 200,
+        Message = "Success"
+      });
+    }
+
+    [HttpPost("invite")]
+    public async Task<ActionResult> Invite(InviteToProjectParmas inviteToProjectParmas)
+    {
+      var currentUser = GetUserFromContext();
+      var projectId = inviteToProjectParmas.ProjectId;
+      var userIds = inviteToProjectParmas.UserIds;
+
+      var project = await _projectRepository.Query()
+        .Where(p => p.Creator == currentUser.Id)
+        .FirstOrDefaultAsync(p => p.Id == projectId);
+
+      if (project == null)
+      {
+        throw new BadRequestException();
+      }
+
+      foreach (var userId in userIds)
+      {
+        project.UserProjects.Add(new UserProject
+        {
+          UserId = userId
+        });
+      }
+
+      var tran = _projectRepository.BeginTransaction();
+
+      try
+      {
+        await _projectRepository.SaveChangesAsync();
+        await tran.CommitAsync();
+      }
+      catch (System.Exception)
+      {
+        await tran.RollbackAsync();
+        return BadRequest();
+      }
 
       return Ok(new
       {
@@ -90,38 +164,17 @@ namespace Api.Controllers
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteProject(Guid id)
     {
-      await _projectRepository.DeleteByIdAsync(id);
+      var projectToDelete = await _projectRepository.FirstOrDefaultAsync(id);
 
-      var boardIds = await _boardRepository.AsQueryable()
-                .Where(x => x.ProjectId == id)
-                .Select(x => x.Id)
-                .ToListAsync();
+      _projectRepository.Remove(projectToDelete);
+      await _projectRepository.SaveChangesAsync();
 
-      await _boardRepository.DeleteManyAsync(x => x.ProjectId == id);
-
-      foreach (var boardId in boardIds)
-      {
-        var listItemIds = await _listRepository.AsQueryable()
-          .Where(l => l.BoardId == boardId)
-          .Select(x => x.Id)
-          .ToListAsync();
-
-        foreach (var listItemId in listItemIds)
-        {
-          await _ticketRepository.DeleteManyAsync(
-              x => x.ListId == listItemId
-          );
-        }
-
-        await _listRepository.DeleteManyAsync(
-            x => x.BoardId == boardId
-        );
-      }
       return Ok(new
       {
         StatusCode = 200,
         Message = "Success"
       });
     }
+
   }
 }

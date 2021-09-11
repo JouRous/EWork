@@ -1,5 +1,5 @@
 import { store } from 'store';
-import http from './http-service';
+import http from './axios-instance';
 
 type StoreType = typeof store;
 

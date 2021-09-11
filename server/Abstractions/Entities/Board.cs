@@ -5,11 +5,11 @@ using Infrastructure.Models;
 
 namespace Abstractions.Entities
 {
-  [BsonCollection("Boards")]
+  // [BsonCollection("Boards")]
   public class Board : BaseEntity
   {
-    public string BoardName { get; set; }
+    public string Name { get; set; }
     public Guid ProjectId { get; set; }
-    public List<ListItem> ListItems { get; set; }
+    public List<List> Lists { get; set; }
   }
 }

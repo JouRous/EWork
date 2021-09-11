@@ -12,11 +12,11 @@ namespace Api.Controllers
 {
   public class ListItemController : BaseController
   {
-    private readonly IMongoRepository<ListItem> _listRepository;
+    private readonly IMongoRepository<List> _listRepository;
     private readonly IMongoRepository<Ticket> _ticketRepository;
     private readonly IMapper _mapper;
 
-    public ListItemController(IMongoRepository<ListItem> listRepository, IMongoRepository<Ticket> ticketRepository, IMapper mapper)
+    public ListItemController(IMongoRepository<List> listRepository, IMongoRepository<Ticket> ticketRepository, IMapper mapper)
     {
       _listRepository = listRepository;
       _ticketRepository = ticketRepository;
@@ -42,7 +42,7 @@ namespace Api.Controllers
     [HttpPost]
     public async Task<ActionResult> CreateList(CreateListParams createListParams)
     {
-      var list = _mapper.Map<ListItem>(createListParams);
+      var list = _mapper.Map<List>(createListParams);
 
       await _listRepository.InsertOneAsync(list);
 

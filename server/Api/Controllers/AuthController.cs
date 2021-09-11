@@ -4,11 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 using BC = BCrypt.Net.BCrypt;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using Infrastructure.Data.Interfaces;
 using Abstractions.Entities;
 using Application.Services.Interfaces;
 using Abstractions.ViewModels;
 using Abstractions.Exceptions;
+using Infrastructure.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.Controllers
 {
@@ -17,11 +18,11 @@ namespace Api.Controllers
     private readonly ITokenService _tokenService;
     private readonly IMapper _mapper;
     private readonly IEmailService _emailService;
-    private readonly IMongoRepository<User> _userRepository;
+    private readonly IRepository<User> _userRepository;
 
     public AuthController(
         IMapper mapper,
-        IMongoRepository<User> userRepository,
+        IRepository<User> userRepository,
         ITokenService tokenService,
         IEmailService emailService)
     {
@@ -35,11 +36,10 @@ namespace Api.Controllers
     [HttpPost("login")]
     public async Task<ActionResult> LoginAsync(LoginParams loginParams)
     {
-      var user = await _userRepository.FindOneAsync(u => u.Email == loginParams.Email);
+      var user = await _userRepository.Query(user => user.Email == loginParams.Email).FirstOrDefaultAsync();
       if (user == null)
       {
         throw new BadRequestException("Email or password incorrect");
-        // throw new NotFoundException("User dose not exist");
       }
 
       var isPasswordVerified = BC.Verify(loginParams.Password, user.Password);
@@ -58,7 +58,7 @@ namespace Api.Controllers
     [HttpPost("register")]
     public async Task<ActionResult> Register(RegisterParams registerParams)
     {
-      var userExisted = await _userRepository.FindOneAsync(x => x.Email == registerParams.Email);
+      var userExisted = await _userRepository.Query(x => x.Email == registerParams.Email).FirstOrDefaultAsync();
 
       if (userExisted != null)
       {
@@ -68,7 +68,8 @@ namespace Api.Controllers
       var user = _mapper.Map<User>(registerParams);
       user.Password = BC.HashPassword(registerParams.Password);
 
-      await _userRepository.InsertOneAsync(user);
+      _userRepository.Add(user);
+      await _userRepository.SaveChangesAsync();
 
       return Ok(new
       {
@@ -80,7 +81,7 @@ namespace Api.Controllers
     [HttpPost("forget-password")]
     public async Task<ActionResult> ForgetPassword(ForgetPasswordParams forgetPasswordParams)
     {
-      var user = await _userRepository.FindOneAsync(u => u.Email == forgetPasswordParams.Email);
+      var user = await _userRepository.Query(u => u.Email == forgetPasswordParams.Email).FirstOrDefaultAsync();
 
       if (user == null)
       {
@@ -108,10 +109,10 @@ namespace Api.Controllers
           .Select(c => c.Value)
           .SingleOrDefault();
 
-      var user = await _userRepository.FindOneAsync(x => x.Email == email);
+      var user = await _userRepository.Query(x => x.Email == email).FirstOrDefaultAsync();
       user.Password = BC.HashPassword(resetPasswordParams.Password);
 
-      await _userRepository.ReplaceOneAsync(user);
+      await _userRepository.SaveChangesAsync();
 
       return Ok(new
       {

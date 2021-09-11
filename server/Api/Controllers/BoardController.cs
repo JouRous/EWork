@@ -13,13 +13,13 @@ namespace Api.Controllers
   public class BoardController : BaseController
   {
     private readonly IMongoRepository<Board> _boardRepository;
-    private readonly IMongoRepository<ListItem> _listRepository;
+    private readonly IMongoRepository<List> _listRepository;
     private readonly IMapper _mapper;
     private readonly IMongoRepository<Ticket> _ticketRepository;
 
     public BoardController(
       IMongoRepository<Board> boardRepository,
-      IMongoRepository<ListItem> listRepository,
+      IMongoRepository<List> listRepository,
       IMongoRepository<Ticket> ticketRepository,
       IMapper mapper)
     {

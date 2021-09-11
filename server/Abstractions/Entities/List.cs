@@ -5,8 +5,8 @@ using Infrastructure.Models;
 
 namespace Abstractions.Entities
 {
-  [BsonCollection("Lists")]
-  public class ListItem : BaseEntity
+  // [BsonCollection("Lists")]
+  public class List : BaseEntity
   {
     public string Name { get; set; }
     public Guid BoardId { get; set; }

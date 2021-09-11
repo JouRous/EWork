@@ -8,9 +8,9 @@ namespace Application.Mapper
   {
     public ListMapperProfile()
     {
-      CreateMap<ListItem, CreateListParams>().ReverseMap();
+      CreateMap<List, CreateListParams>().ReverseMap();
 
-      CreateMap<ListItem, ListItemGetResult>().ReverseMap();
+      CreateMap<List, ListItemGetResult>().ReverseMap();
     }
   }
 }

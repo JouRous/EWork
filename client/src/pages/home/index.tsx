@@ -1,9 +1,10 @@
-import { IProject } from 'models/project';
+import { IProject } from 'models/IProject';
 import { FC, useEffect, useState } from 'react';
-import http from 'services/http-service';
 import styled from 'styled-components';
-import { ListWorkspace } from '../../components/ListWorkspace';
-import { Sidebar } from '../../components/Sidebar';
+import { ListWorkspace } from 'components/ListWorkspace';
+import { Sidebar } from 'components/Sidebar';
+import http from 'services/http-service';
+import { forkJoin } from 'rxjs';
 
 interface IProps {}
 
@@ -15,11 +16,16 @@ const HomeContainer = styled.div`
 
 const HomePage: FC<IProps> = () => {
   const [projects, setProjects] = useState<IProject[]>([]);
+  const [guestProjects, setGuestProjects] = useState<IProject[]>([]);
 
   useEffect(() => {
     async function fetchApi() {
-      const res = await http.get<IProject[]>('/api/v1/project');
-      setProjects(res.data);
+      const project$ = http.get<IProject[]>('/api/v1/project');
+      const guestProjects$ = http.get<IProject[]>('/api/v1/project/guest');
+      forkJoin([project$, guestProjects$]).subscribe((data) => {
+        setProjects(data[0]);
+        setGuestProjects(data[1]);
+      });
     }
 
     fetchApi();
@@ -28,7 +34,7 @@ const HomePage: FC<IProps> = () => {
   return (
     <HomeContainer className="flex items-start justify-center">
       <Sidebar />
-      <ListWorkspace projects={projects} />
+      <ListWorkspace projects={projects} guestProjects={guestProjects} />
     </HomeContainer>
   );
 };

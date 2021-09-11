@@ -1,4 +1,4 @@
-import { IProject } from 'models/project';
+import { IProject } from 'models/IProject';
 import { FC } from 'react';
 import styled from 'styled-components';
 import { ListBoard } from './ListBoard';
@@ -26,18 +26,27 @@ const SectionTitle = styled.h3`
 
 interface IProps {
   projects: IProject[];
+  guestProjects: IProject[];
 }
 
-export const ListWorkspace: FC<IProps> = ({ projects }) => {
+export const ListWorkspace: FC<IProps> = ({ projects, guestProjects }) => {
   return (
     <Wrapper className="ml-4">
       <div>
         <SectionTitle className="uppercase">Your Workspaces</SectionTitle>
-        <div>
-          <WorkspaceItem />
-          <ListBoard />
-        </div>
+        {projects.map((project) => (
+          <div>
+            <WorkspaceItem project={project} />
+            <ListBoard boards={project.boards} />
+          </div>
+        ))}
         <SectionTitle className="uppercase">Guest Workspaces</SectionTitle>
+        {guestProjects.map((project) => (
+          <div>
+            <WorkspaceItem project={project} />
+            <ListBoard boards={project.boards} />
+          </div>
+        ))}
       </div>
     </Wrapper>
   );

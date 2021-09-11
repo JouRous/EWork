@@ -3,6 +3,8 @@ import { ReactComponent as BoardIcon } from 'assets/icons/board-icon.svg';
 import { ReactComponent as TableIcon } from 'assets/icons/table-icon.svg';
 import { ReactComponent as GroupUserIcon } from 'assets/icons/group-user.svg';
 import styled from 'styled-components';
+import { IProject } from 'models/IProject';
+import { FC } from 'react';
 
 const Button = styled(Link)`
   display: flex;
@@ -23,12 +25,16 @@ const Button = styled(Link)`
   }
 `;
 
-export const WorkspaceItem = () => {
+interface IProps {
+  project: IProject;
+}
+
+export const WorkspaceItem: FC<IProps> = ({ project }) => {
   return (
     <div>
       <div className="flex items-center">
         <div style={{ width: 36, height: 36, backgroundColor: 'black' }}></div>
-        <h1 className="flex-1 ml-2">Workspace</h1>
+        <h1 className="flex-1 ml-2">{project?.name}</h1>
         <div className="flex">
           <Button to="">
             <BoardIcon style={{ height: 16 }} />

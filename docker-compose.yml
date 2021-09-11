@@ -10,18 +10,41 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: '123123'
     networks:
       - my-network
+
+  eworkdb-sqlserver:
+    container_name: eworkdb-sqlserver
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      ACCEPT_EULA: 'Y'
+      SA_PASSWORD: '123123Mau@'
+    volumes:
+      - eworkdb-sqlserver-volume:/var/opt/mssql/data
+    networks:
+      - my-network
+
   api:
     container_name: app_api
     build:
-      context: ./App
+      context: ./server
       dockerfile: Api/Dockerfile
     restart: unless-stopped
     environment:
       - 'ConnectionStrings:Default=mongodb://root:123123@eworkdb:27017/'
+      - 'ConnectionStrings:SqlServer=Server=eworkdb-sqlserver,1433;Database=EWork;User Id=sa;Password=123123Mau@;'
     networks:
       - my-network
     depends_on:
-      - qtaskdb
+      - eworkdb
+      - eworkdb-sqlserver
+
+  web:
+    container_name: app_web
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    networks:
+      - my-network
 
   nginx:
     container_name: nginx
@@ -29,6 +52,7 @@ services:
       context: ./nginx
     depends_on:
       - api
+      - web
     networks:
       - my-network
 
@@ -46,5 +70,6 @@ volumes:
   app-data:
   portainer_data:
   pgadmin_data:
+  eworkdb-sqlserver-volume:
 networks:
   my-network:

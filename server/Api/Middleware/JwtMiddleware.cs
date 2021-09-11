@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Abstractions.Entities;
 using Infrastructure.Data.Interfaces;
+using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -25,7 +26,7 @@ namespace Api.Middleware
       _logger = logger;
     }
 
-    public async Task Invoke(HttpContext context, IMongoRepository<User> repository)
+    public async Task Invoke(HttpContext context, IRepository<User> repository)
     {
       var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
@@ -37,7 +38,7 @@ namespace Api.Middleware
       await _next(context);
     }
 
-    public async Task attachUserToContext(HttpContext context, IMongoRepository<User> repository, string token)
+    public async Task attachUserToContext(HttpContext context, IRepository<User> repository, string token)
     {
       try
       {
@@ -58,7 +59,7 @@ namespace Api.Middleware
         var user = new User();
         try
         {
-          user = await repository.FindByIdAsync(new Guid(userId));
+          user = await repository.FirstOrDefaultAsync(new Guid(userId));
         }
         catch (Exception ex)
         {

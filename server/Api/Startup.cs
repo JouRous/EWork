@@ -1,3 +1,4 @@
+using Api.Extensions;
 using Api.Middleware;
 using Application;
 using Infrastructure;
@@ -19,25 +20,27 @@ namespace Api
     }
 
     public IConfiguration Configuration { get; }
-    private readonly string _policyName = "CorsPolicy";
+    // private readonly string _policyName = "CorsPolicy";
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
-      // services.AddCors();
-      services.AddCors(opt =>
-        {
-          opt.AddPolicy(name: _policyName, builder =>
-          {
-            builder
-              .WithOrigins("http://localhost:3000")
-              // .AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-          });
-        });
+      services.AddCors();
+      // services.AddCors(opt =>
+      //   {
+      //     opt.AddPolicy(name: _policyName, builder =>
+      //     {
+      //       builder
+      //         .WithOrigins("http://localhost:3000")
+      //         // .AllowAnyOrigin()
+      //         .AllowAnyHeader()
+      //         .AllowAnyMethod();
+      //     });
+      //   });
 
       services.AddControllers();
+
+      services.AddApiServices(Configuration);
 
       services.AddApplicationServices(Configuration);
       services.AddInfrastructureServices(Configuration);
@@ -74,7 +77,11 @@ namespace Api
 
       app.UseMiddleware<ErrorHandler>();
 
-      app.UseCors(_policyName);
+      // app.UseCors(_policyName);
+
+      app.UseCors(
+        options => options.SetIsOriginAllowed(x => _ = true).AllowAnyMethod().AllowAnyHeader().AllowCredentials()
+      );
 
       // app.UseCors(x =>
       // {
