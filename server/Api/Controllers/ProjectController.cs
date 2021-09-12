@@ -40,8 +40,13 @@ namespace Api.Controllers
     {
       var user = GetUserFromContext();
 
-      var projects = await _projectRepository.Query(p => p.Creator == user.Id).ToListAsync();
-      return Ok(projects);
+
+      var projects = await _projectRepository
+        .Query(p => p.Creator == user.Id)
+        .Include(p => p.Boards)
+        .ToListAsync();
+
+      return Ok(_mapper.Map<IList<ProjectGetResult>>(projects));
     }
 
     [HttpGet("guest")]
@@ -60,19 +65,19 @@ namespace Api.Controllers
     [HttpGet("{id}")]
     public async Task<ActionResult> GetById(Guid id)
     {
-      var project = await _projectRepository.FirstOrDefaultAsync(id);
+      var project = await _projectRepository.Query().Include(p => p.Boards).FirstOrDefaultAsync(p => p.Id == id);
       return Ok(project);
     }
 
     [HttpGet("{id}/boards")]
     public async Task<ActionResult> GetBoardByProjectId(Guid id)
     {
-      var projects = await _projectRepository.Query()
-        .Where(p => p.Id == id)
+      var boards = await _projectRepository.Query(p => p.Id == id)
         .Include(p => p.Boards)
-        .ToListAsync();
+        .Select(p => p.Boards)
+        .FirstOrDefaultAsync();
 
-      return Ok(projects);
+      return Ok(boards);
     }
 
     [HttpPost]

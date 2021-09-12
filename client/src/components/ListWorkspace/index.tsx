@@ -35,16 +35,16 @@ export const ListWorkspace: FC<IProps> = ({ projects, guestProjects }) => {
       <div>
         <SectionTitle className="uppercase">Your Workspaces</SectionTitle>
         {projects.map((project) => (
-          <div>
+          <div className="mb-6" key={project.id}>
             <WorkspaceItem project={project} />
-            <ListBoard boards={project.boards} />
+            <ListBoard projectId={project.id} />
           </div>
         ))}
         <SectionTitle className="uppercase">Guest Workspaces</SectionTitle>
         {guestProjects.map((project) => (
           <div>
             <WorkspaceItem project={project} />
-            <ListBoard boards={project.boards} />
+            <ListBoard projectId={project.id} />
           </div>
         ))}
       </div>

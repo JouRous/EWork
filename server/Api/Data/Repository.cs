@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Infrastructure.Data;
 using Infrastructure.Models;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -54,7 +53,7 @@ namespace Api.Data
 
     public IQueryable<T> Query()
     {
-      return DbSet;
+      return DbSet.AsQueryable();
     }
 
     public void Remove(T entity)

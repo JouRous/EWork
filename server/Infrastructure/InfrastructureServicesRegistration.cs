@@ -1,5 +1,3 @@
-using Infrastructure.Data.Interfaces;
-using Infrastructure.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,7 +7,6 @@ namespace Infrastructure
   {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration config)
     {
-      services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
 
       return services;
     }

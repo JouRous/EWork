@@ -10,6 +10,6 @@ namespace Abstractions.Entities
   {
     public string Name { get; set; }
     public Guid ProjectId { get; set; }
-    public List<List> Lists { get; set; }
+    public Project Project { get; set; }
   }
 }

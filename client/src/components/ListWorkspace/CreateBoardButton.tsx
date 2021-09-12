@@ -1,3 +1,4 @@
+import { FC } from 'react';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
@@ -19,11 +20,24 @@ const Wrapper = styled.div`
   }
 `;
 
-export const CreateBoardButton = () => {
+interface IProps {
+  projectId: string;
+  openForm: () => void;
+}
+
+export const CreateBoardButton: FC<IProps> = ({ openForm }) => {
+  function create() {
+    openForm();
+  }
+
   return (
     <div>
       <Wrapper className="grid place-items-center rounded w-full p-2">
-        <button style={{ height: 80 }} className="block w-full">
+        <button
+          onClick={create}
+          style={{ height: 80 }}
+          className="block w-full"
+        >
           <div>Create new board</div>
         </button>
       </Wrapper>

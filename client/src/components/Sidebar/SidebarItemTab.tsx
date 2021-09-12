@@ -1,5 +1,5 @@
 import { TabLink } from './TabLink';
-import { useState } from 'react';
+import { FC, useState } from 'react';
 import styled from 'styled-components';
 import { ReactComponent as ArrowUpIcon } from 'assets/icons/arrow-up.svg';
 import { ReactComponent as ArrowDownIcon } from 'assets/icons/arrow-down.svg';
@@ -7,6 +7,7 @@ import { ReactComponent as BoardIcon } from 'assets/icons/board-icon.svg';
 import { ReactComponent as TableIcon } from 'assets/icons/table-icon.svg';
 import { ReactComponent as GroupUserIcon } from 'assets/icons/group-user.svg';
 import { ReactComponent as HeartIcon } from 'assets/icons/heart-icon.svg';
+import { IProject } from 'models/IProject';
 
 const SidebarItem = styled.button`
   align-items: center;
@@ -30,7 +31,11 @@ const SidebarItem = styled.button`
   }
 `;
 
-export const SidebarItemTab = () => {
+interface IProps {
+  project: IProject;
+}
+
+export const SidebarItemTab: FC<IProps> = ({ project }) => {
   const [isToggle, setIsToggle] = useState(false);
 
   function toggle() {
@@ -44,7 +49,7 @@ export const SidebarItemTab = () => {
           onClick={toggle}
           className="w-full flex justify-between items-center cursor-pointer font-bold px-2 py-5"
         >
-          <span> Workspace name</span>
+          <span>{project.name}</span>
           <span>
             {isToggle ? (
               <ArrowUpIcon style={{ width: 18, height: 18, lineHeight: 24 }} />

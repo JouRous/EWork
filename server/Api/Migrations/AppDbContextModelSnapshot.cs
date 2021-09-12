@@ -181,11 +181,13 @@ namespace Api.Migrations
 
             modelBuilder.Entity("Abstractions.Entities.Board", b =>
                 {
-                    b.HasOne("Abstractions.Entities.Project", null)
+                    b.HasOne("Abstractions.Entities.Project", "Project")
                         .WithMany("Boards")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("Abstractions.Entities.List", b =>

@@ -38,7 +38,7 @@ namespace Api
       //     });
       //   });
 
-      services.AddControllers();
+      services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
       services.AddApiServices(Configuration);
 

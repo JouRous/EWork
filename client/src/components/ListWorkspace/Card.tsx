@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 const BoardCardWrapper = styled(Link)`
-  background-image: url('https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x270/697ce3ddf41617efb782f533422a1bf5/photo-1630704236714-b9ae325f1aad.jpg');
+  background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLOS1206m_ryaCwc6NpJGRjgNgN7jVtB3bvR9uYUvoc0MCCTdsTgKPzxKd5BDKOvrLhfA&usqp=CAU');
 `;
 
 interface IProps {
@@ -13,7 +13,7 @@ interface IProps {
 
 export const Card: FC<IProps> = ({ board }) => {
   return (
-    <div className="mb-3">
+    <div>
       <BoardCardWrapper to="" className="block p-2 rounded">
         <div
           style={{ height: 80 }}

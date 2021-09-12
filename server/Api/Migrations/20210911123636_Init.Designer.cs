@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20210911061834_Init")]
+    [Migration("20210911123636_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -183,11 +183,13 @@ namespace Api.Migrations
 
             modelBuilder.Entity("Abstractions.Entities.Board", b =>
                 {
-                    b.HasOne("Abstractions.Entities.Project", null)
+                    b.HasOne("Abstractions.Entities.Project", "Project")
                         .WithMany("Boards")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("Abstractions.Entities.List", b =>

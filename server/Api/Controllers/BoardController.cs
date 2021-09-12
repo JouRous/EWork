@@ -3,43 +3,28 @@ using System.Threading.Tasks;
 using Abstractions.Entities;
 using Abstractions.ViewModels;
 using AutoMapper;
-using Infrastructure.Data.Interfaces;
+using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
-using MongoDB.Driver.Linq;
 
 namespace Api.Controllers
 {
   public class BoardController : BaseController
   {
-    private readonly IMongoRepository<Board> _boardRepository;
-    private readonly IMongoRepository<List> _listRepository;
+    private readonly IRepository<Board> _boardRepository;
     private readonly IMapper _mapper;
-    private readonly IMongoRepository<Ticket> _ticketRepository;
 
     public BoardController(
-      IMongoRepository<Board> boardRepository,
-      IMongoRepository<List> listRepository,
-      IMongoRepository<Ticket> ticketRepository,
+      IRepository<Board> boardRepository,
       IMapper mapper)
     {
       _boardRepository = boardRepository;
-      _listRepository = listRepository;
-      _ticketRepository = ticketRepository;
       _mapper = mapper;
-    }
-
-    [HttpGet]
-    public async Task<ActionResult> GetAll()
-    {
-      return Ok(await _boardRepository.AsQueryable().ToListAsync());
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult> GetById(Guid id)
     {
-      var board = await _boardRepository.FindByIdAsync(id);
-
+      var board = await _boardRepository.FirstOrDefaultAsync(id);
       return Ok(board);
     }
 
@@ -47,7 +32,8 @@ namespace Api.Controllers
     public async Task<ActionResult> Create(CreateBoardParams createBoardParams)
     {
       var board = _mapper.Map<Board>(createBoardParams);
-      await _boardRepository.InsertOneAsync(board);
+      _boardRepository.Add(board);
+      await _boardRepository.SaveChangesAsync();
 
       return Ok(new
       {
@@ -59,10 +45,10 @@ namespace Api.Controllers
     [HttpPut("{id}")]
     public async Task<ActionResult> Update(Guid id, UpdateBoardParams updateBoardParams)
     {
-      var board = _mapper.Map<Board>(updateBoardParams);
-      board.Id = id;
+      var boardToUpdate = await _boardRepository.FirstOrDefaultAsync(id);
+      boardToUpdate.Name = updateBoardParams.Name;
 
-      await _boardRepository.ReplaceOneAsync(board);
+      await _boardRepository.SaveChangesAsync();
 
       return Ok(new
       {
@@ -74,24 +60,9 @@ namespace Api.Controllers
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(Guid id)
     {
-      await _boardRepository.DeleteByIdAsync(id);
-
-      var listItemIds = _listRepository.AsQueryable()
-                .Where(l => l.BoardId == id)
-                .Select(x => x.Id)
-                .ToList();
-
-      foreach (var listItemId in listItemIds)
-      {
-        await _ticketRepository.DeleteManyAsync(
-            x => x.ListId == listItemId
-        );
-      }
-
-      await _listRepository.DeleteManyAsync(
-          x => x.BoardId == id
-      );
-      // await _listRepository.DeleteListWithBoard(id);
+      var boardToDelete = await _boardRepository.FirstOrDefaultAsync(id);
+      _boardRepository.Remove(boardToDelete);
+      await _boardRepository.SaveChangesAsync();
 
       return Ok(new
       {
