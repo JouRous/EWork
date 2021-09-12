@@ -21,7 +21,6 @@ const Wrapper = styled.div`
 `;
 
 interface IProps {
-  projectId: string;
   openForm: () => void;
 }
 

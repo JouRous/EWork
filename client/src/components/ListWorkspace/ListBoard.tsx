@@ -1,15 +1,16 @@
 import { CreateBoardModal } from 'components/CreateBoardModal';
 import { IBoard } from 'models/IBoard';
+import { IProject } from 'models/IProject';
 import { FC, useEffect, useState } from 'react';
 import http from 'services/http-service';
 import { Card } from './Card';
 import { CreateBoardButton } from './CreateBoardButton';
 
 interface IProps {
-  projectId: string;
+  project: IProject;
 }
 
-export const ListBoard: FC<IProps> = ({ projectId }) => {
+export const ListBoard: FC<IProps> = ({ project }) => {
   const [boards, setBoards] = useState<IBoard[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
@@ -17,9 +18,8 @@ export const ListBoard: FC<IProps> = ({ projectId }) => {
   useEffect(() => {
     function fetchBoards() {
       http
-        .get<IBoard[]>(`/api/v1/project/${projectId}/boards`)
+        .get<IBoard[]>(`/api/v1/project/${project.id}/boards`)
         .subscribe((data) => {
-          console.log(data);
           setBoards(data);
           setLoading(false);
         });
@@ -28,12 +28,13 @@ export const ListBoard: FC<IProps> = ({ projectId }) => {
     if (loading) {
       fetchBoards();
     }
-  }, [projectId, loading]);
+  }, [project, loading]);
 
   function handleCreateBoard(data: any) {
     const body = {
       name: data.name,
-      projectId,
+      background: data.background,
+      projectId: project.id,
     };
 
     http.post('/api/v1/board', body).subscribe((response) => {
@@ -57,11 +58,15 @@ export const ListBoard: FC<IProps> = ({ projectId }) => {
           {boards.map((board) => (
             <Card key={board.id} board={board} />
           ))}
-          <CreateBoardButton openForm={openModal} projectId={projectId} />
+          <CreateBoardButton openForm={openModal} />
         </div>
       </div>
       {isFormOpen ? (
-        <CreateBoardModal closeModal={closeModal} submit={handleCreateBoard} />
+        <CreateBoardModal
+          project={project}
+          closeModal={closeModal}
+          submit={handleCreateBoard}
+        />
       ) : null}
     </>
   );
