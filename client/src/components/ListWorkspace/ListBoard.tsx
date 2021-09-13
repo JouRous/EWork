@@ -54,7 +54,7 @@ export const ListBoard: FC<IProps> = ({ project }) => {
   return (
     <>
       <div className="mt-2">
-        <div className="grid grid-cols-4 gap-x-4">
+        <div className="grid grid-cols-4 gap-4">
           {boards.map((board) => (
             <Card key={board.id} board={board} />
           ))}

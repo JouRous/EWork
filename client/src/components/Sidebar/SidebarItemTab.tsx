@@ -8,6 +8,7 @@ import { ReactComponent as TableIcon } from 'assets/icons/table-icon.svg';
 import { ReactComponent as GroupUserIcon } from 'assets/icons/group-user.svg';
 import { ReactComponent as HeartIcon } from 'assets/icons/heart-icon.svg';
 import { IProject } from 'models/IProject';
+import Avatar from 'react-avatar';
 
 const SidebarItem = styled.button`
   align-items: center;
@@ -47,9 +48,10 @@ export const SidebarItemTab: FC<IProps> = ({ project }) => {
       <li>
         <SidebarItem
           onClick={toggle}
-          className="w-full flex justify-between items-center cursor-pointer font-bold px-2 py-5"
+          className="w-full flex items-center cursor-pointer font-bold px-2 py-5"
         >
-          <span>{project.name}</span>
+          <Avatar name={project.name} size="32" />
+          <span className="flex-1 text-left ml-3">{project.name}</span>
           <span>
             {isToggle ? (
               <ArrowUpIcon style={{ width: 18, height: 18, lineHeight: 24 }} />

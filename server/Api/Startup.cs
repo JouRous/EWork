@@ -71,6 +71,7 @@ namespace Api
 
       app.UseMiddleware<JwtMiddleware>();
 
+      app.UseStaticFiles();
       // app.UseHttpsRedirection();
 
       app.UseRouting();

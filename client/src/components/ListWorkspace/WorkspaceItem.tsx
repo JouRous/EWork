@@ -1,10 +1,11 @@
+import { FC } from 'react';
+import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import Avatar from 'react-avatar';
 import { ReactComponent as BoardIcon } from 'assets/icons/board-icon.svg';
 import { ReactComponent as TableIcon } from 'assets/icons/table-icon.svg';
 import { ReactComponent as GroupUserIcon } from 'assets/icons/group-user.svg';
-import styled from 'styled-components';
 import { IProject } from 'models/IProject';
-import { FC } from 'react';
 
 const Button = styled(Link)`
   display: flex;
@@ -33,7 +34,7 @@ export const WorkspaceItem: FC<IProps> = ({ project }) => {
   return (
     <div>
       <div className="flex items-center">
-        <div style={{ width: 36, height: 36, backgroundColor: 'black' }}></div>
+        <Avatar size="36" textSizeRatio={1.4} name={project.name} />
         <h1 className="flex-1 ml-2">{project?.name}</h1>
         <div className="flex">
           <Button to="">

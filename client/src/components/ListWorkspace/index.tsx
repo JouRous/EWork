@@ -31,7 +31,7 @@ interface IProps {
 
 export const ListWorkspace: FC<IProps> = ({ projects, guestProjects }) => {
   return (
-    <Wrapper className="ml-4">
+    <Wrapper className="ml-8">
       <div>
         <SectionTitle className="uppercase">Your Workspaces</SectionTitle>
         {projects.map((project) => (
