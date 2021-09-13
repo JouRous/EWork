@@ -144,7 +144,7 @@ export const CreateProjectModal: FC<IProps> = () => {
               >
                 Workspace descriptions (Optional)
               </label>
-              <TextArea rows={6} {...register('name')} />
+              <TextArea rows={6} />
             </div>
             <SubmitButton
               onClick={handleSubmit((data) => closeCreateModal(data))}
