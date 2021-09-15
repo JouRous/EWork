@@ -1,13 +1,13 @@
-import { IProject } from 'models/IProject';
 import { FC, useEffect, useState } from 'react';
+import { forkJoin } from 'rxjs';
 import styled from 'styled-components';
+import http from 'services/http-service';
 import { ListWorkspace } from 'components/ListWorkspace';
 import { Sidebar } from 'components/Sidebar';
-import http from 'services/http-service';
-import { forkJoin } from 'rxjs';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { fetchProjectSuccess } from 'store/features/project/projectSlice';
 import { CreateProjectModal } from 'components/CreateProjectModal';
+import { IProject } from 'models/IProject';
 
 interface IProps {}
 

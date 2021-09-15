@@ -4,6 +4,7 @@ import { ReactComponent as HomeIcon } from '../../assets/icons/home-icon.svg';
 import { ReactComponent as BoardIcon } from '../../assets/icons/board-icon.svg';
 import { ReactComponent as SearchIcon } from '../../assets/icons/search-icon.svg';
 import DefaultAvatar from '../../assets/icons/avatar-default.svg';
+import Avatar from 'react-avatar';
 
 interface IProps {
   user: IUser;
@@ -13,7 +14,8 @@ export const Header: FC<IProps> = ({ user }) => {
   return (
     <div
       className="fixed w-full top-0"
-      style={{ backgroundColor: '#026AA7', height: 45, zIndex: 100 }}
+      style={{ backgroundColor: 'rgba(0,0,0,0.1)', height: 45, zIndex: 100 }}
+      // style={{ backgroundColor: '#026AA7', height: 45, zIndex: 100 }}
     >
       <div className="flex justify-between items-center px-2 py-1 text-white">
         <div style={{ height: 35 }} className="flex">
@@ -51,11 +53,15 @@ export const Header: FC<IProps> = ({ user }) => {
             style={{ width: 35, height: 35 }}
             className="inline-block rounded-full overflow-hidden"
           >
-            <img
-              className="block h-full w-full"
-              src={DefaultAvatar}
-              alt="user-avatar"
-            />
+            {user ? (
+              <Avatar name={user.username} size="35" />
+            ) : (
+              <img
+                className="block h-full w-full"
+                src={DefaultAvatar}
+                alt="user-avatar"
+              />
+            )}
           </button>
         </div>
       </div>
