@@ -9,7 +9,9 @@ namespace Application.Mapper
       services.AddAutoMapper(
           typeof(UserMapperProfile).Assembly,
           typeof(ProjectMapperProfile).Assembly,
-          typeof(BoardMapperProfile).Assembly
+          typeof(BoardMapperProfile).Assembly,
+          typeof(ListMapperProfile).Assembly,
+          typeof(TicketMapperProfile).Assembly
       );
 
       return services;

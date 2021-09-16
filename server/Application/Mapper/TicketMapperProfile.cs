@@ -9,6 +9,8 @@ namespace Application.Mapper
     public TicketMapperProfile()
     {
       CreateMap<Ticket, CreateTicketParams>().ReverseMap();
+
+      CreateMap<Ticket, TicketGetResult>();
     }
   }
 }

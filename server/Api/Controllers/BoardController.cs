@@ -31,7 +31,20 @@ namespace Api.Controllers
         .Include(b => b.Lists)
         .ProjectTo<BoardGetResult>(_mapper.ConfigurationProvider)
         .FirstOrDefaultAsync();
+      board.Lists = board.Lists.OrderBy(l => l.Pos).ToList();
       return Ok(board);
+    }
+
+    [HttpGet("{id}/tickets")]
+    public async Task<ActionResult> GetTicketsInBoard(Guid id)
+    {
+      var tickets = await _boardRepository.Query(b => b.Id == id)
+        .Include(b => b.Lists.OrderByDescending(l => l.Pos))
+        .ThenInclude(l => l.Tickets)
+        .Select(x => x.Lists.Select(l => l.Tickets))
+        .ToListAsync();
+
+      return Ok(tickets);
     }
 
     [HttpPost]

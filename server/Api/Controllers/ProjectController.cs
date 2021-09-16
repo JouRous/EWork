@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Api.Controllers
 {
   [AuthorizeAttribute]
+  [ApiVersion("1.0")]
   public class ProjectController : BaseController
   {
     private readonly IRepository<Project> _projectRepository;
@@ -35,7 +36,7 @@ namespace Api.Controllers
       return (User)HttpContext.Items["User"];
     }
 
-    [HttpGet]
+    [HttpGet, MapToApiVersion("1.0")]
     public async Task<ActionResult> GetAll()
     {
       var user = GetUserFromContext();

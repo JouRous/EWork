@@ -1,0 +1,4 @@
+namespace Abstractions.ViewModels
+{
+
+}

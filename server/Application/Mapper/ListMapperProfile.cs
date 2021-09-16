@@ -10,7 +10,7 @@ namespace Application.Mapper
     {
       CreateMap<List, CreateListParams>().ReverseMap();
 
-      CreateMap<List, ListItemGetResult>().ReverseMap();
+      CreateMap<List, ListGetResult>().ReverseMap();
     }
   }
 }

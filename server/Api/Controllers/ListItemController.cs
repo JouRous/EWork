@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Abstractions.Entities;
 using Abstractions.ViewModels;
@@ -34,10 +35,20 @@ namespace Api.Controllers
     public async Task<ActionResult> GetById(Guid id)
     {
       var list = await _listRepository.Query(l => l.Id == id)
-        .Include(l => l.Tickets)
         .FirstOrDefaultAsync();
 
       return Ok(list);
+    }
+
+    [HttpGet("{id}/tickets")]
+    public async Task<ActionResult> GetTickets(Guid id)
+    {
+      var tickets = await _listRepository.Query(l => l.Id == id)
+        .Include(l => l.Tickets)
+        .Select(l => l.Tickets)
+        .FirstOrDefaultAsync();
+
+      return Ok(tickets);
     }
 
     [HttpPost]
@@ -53,6 +64,17 @@ namespace Api.Controllers
         StatusCode = 200,
         Message = "Success"
       });
+    }
+
+    [HttpPost("{id}/pos")]
+    public async Task<ActionResult> MoveList(Guid id, MoveListParams moveListParams)
+    {
+      var list = await _listRepository.FirstOrDefaultAsync(id);
+      list.Pos = moveListParams.Pos;
+
+      await _listRepository.SaveChangesAsync();
+
+      return Ok(moveListParams.Pos);
     }
   }
 }

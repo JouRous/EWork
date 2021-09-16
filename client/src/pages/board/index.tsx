@@ -8,7 +8,7 @@ import http from 'services/http-service';
 const BoardPage: FC<any> = () => {
   const background =
     'https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2239x1600/9cd9d9e923c9fa0cb96ac27418fad55c/photo-1630980260348-16f484cb6471.jpg';
-  const boardInit = { id: '', name: '', listItemIds: [], lists: [] } as IBoard;
+  const boardInit = { id: '', name: '', lists: [] } as IBoard;
   const [board, setBoard] = useState(boardInit);
   const match = useRouteMatch<{ id: string }>();
 
@@ -39,16 +39,43 @@ const BoardPage: FC<any> = () => {
     }
 
     if (type === 'list') {
-      const newListOrder = [...board.listItemIds];
-      const movedList = board.listItemIds[source.index];
+      const newListOrder = [...board.lists];
+      const movedList = board.lists[source.index];
       newListOrder.splice(source.index, 1);
       newListOrder.splice(destination.index, 0, movedList);
 
+      // if (destination.index === 0) {
+      //   movedList.pos = newListOrder[destination.index + 1].pos - 1024;
+      // } else if (destination.index === newListOrder.length - 1) {
+      //   movedList.pos = newListOrder[destination.index].pos + 4096;
+      // } else {
+      // }
+
+      switch (destination.index) {
+        case 0:
+          movedList.pos = newListOrder[destination.index + 1].pos - 1024;
+          break;
+        case newListOrder.length - 1:
+          movedList.pos = newListOrder[destination.index].pos + 4096;
+          break;
+        default:
+          movedList.pos =
+            (newListOrder[destination.index - 1].pos +
+              newListOrder[destination.index + 1].pos) /
+            2;
+          break;
+      }
+
       const newBoard = {
         ...board,
-        listItemIds: newListOrder,
+        lists: newListOrder,
       };
 
+      http
+        .post<{ pos: number }>(`/api/v1/listitem/${draggableId}/pos`, {
+          pos: movedList.pos,
+        })
+        .subscribe((data) => data);
       setBoard(newBoard);
       return;
     }
@@ -123,8 +150,8 @@ const BoardPage: FC<any> = () => {
             >
               {(provided) => (
                 <div {...provided.droppableProps} ref={provided.innerRef}>
-                  {board.listItemIds.map((listId, index) => (
-                    <Column key={listId} index={index} listId={listId}></Column>
+                  {board.lists.map((list, index) => (
+                    <Column key={list.id} index={index} list={list}></Column>
                   ))}
                   {provided.placeholder}
                 </div>
