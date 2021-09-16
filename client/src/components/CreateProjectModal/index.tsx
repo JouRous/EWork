@@ -101,7 +101,6 @@ export const CreateProjectModal: FC<IProps> = () => {
   function closeCreateModal(data: any) {
     const body = { ...data };
     http.post('/api/v1/project', body).subscribe((response) => {
-      console.log(response);
       reset({ name: '' });
       dispatch(closeModal());
     });

@@ -4,4 +4,5 @@ export interface IBoard {
   id: string;
   name: string;
   lists: IList[];
+  listItemIds: string[];
 }

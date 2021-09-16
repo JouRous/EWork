@@ -4,7 +4,7 @@ namespace Abstractions.ViewModels
 {
   public class CreateListParams
   {
-    public string ListName { get; set; }
+    public string Name { get; set; }
     public Guid BoardId { get; set; }
   }
 }

@@ -10,6 +10,6 @@ namespace Abstractions.Entities
   {
     public string Name { get; set; }
     public Guid BoardId { get; set; }
-    public List<Ticket> ListTickets { get; set; } = new List<Ticket>();
+    public List<Ticket> Tickets { get; set; } = new List<Ticket>();
   }
 }

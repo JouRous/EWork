@@ -22,7 +22,6 @@ export const Sidebar: FC<IProps> = ({ projects }) => {
   const dispatch = useAppDispatch();
 
   function openCreateModal() {
-    console.log('open modal');
     dispatch(openModal());
   }
 

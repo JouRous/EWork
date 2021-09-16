@@ -14,7 +14,7 @@ interface IProps {
 export const Card: FC<IProps> = ({ board }) => {
   return (
     <div>
-      <BoardCardWrapper to="" className="block p-2 rounded">
+      <BoardCardWrapper to={`/b/${board.id}`} className="block p-2 rounded">
         <div
           style={{ height: 80 }}
           className="flex flex-col justify-between relative"

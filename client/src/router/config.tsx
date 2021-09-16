@@ -25,6 +25,12 @@ export const routes: IRoute[] = [
     private: true,
   },
   {
+    path: '/b',
+    exact: true,
+    fallback: <div>...</div>,
+    redirect: '/',
+  },
+  {
     path: '/b/:id',
     exact: false,
     fallback: <div>...</div>,

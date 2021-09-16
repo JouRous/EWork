@@ -1,12 +1,27 @@
 import { Column } from 'components/Column';
-import { FC, useState } from 'react';
+import { IBoard } from 'models/IBoard';
+import { FC, useEffect, useState } from 'react';
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
-import { mockData as _board } from './mock-data';
+import { useRouteMatch } from 'react-router';
+import http from 'services/http-service';
 
 const BoardPage: FC<any> = () => {
   const background =
     'https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2239x1600/9cd9d9e923c9fa0cb96ac27418fad55c/photo-1630980260348-16f484cb6471.jpg';
-  const [board, setBoard] = useState(_board);
+  const boardInit = { id: '', name: '', listItemIds: [], lists: [] } as IBoard;
+  const [board, setBoard] = useState(boardInit);
+  const match = useRouteMatch<{ id: string }>();
+
+  useEffect(() => {
+    function fetchBoard() {
+      const boardId = match.params.id;
+      http.get<IBoard>(`/api/v1/board/${boardId}`).subscribe((data) => {
+        setBoard(data);
+      });
+    }
+
+    fetchBoard();
+  }, [match]);
 
   const onDragEnd = (result: DropResult) => {
     const { destination, source, draggableId, type } = result;
@@ -24,17 +39,18 @@ const BoardPage: FC<any> = () => {
     }
 
     if (type === 'list') {
-      const newListOrder = [...board.lists];
-      const movedList = board.lists[source.index];
+      const newListOrder = [...board.listItemIds];
+      const movedList = board.listItemIds[source.index];
       newListOrder.splice(source.index, 1);
       newListOrder.splice(destination.index, 0, movedList);
 
       const newBoard = {
         ...board,
-        lists: newListOrder,
+        listItemIds: newListOrder,
       };
 
       setBoard(newBoard);
+      return;
     }
 
     if (source.droppableId === destination.droppableId) {
@@ -94,7 +110,7 @@ const BoardPage: FC<any> = () => {
       <div
         style={{ backgroundColor: 'transparent', height: 45, width: '100%' }}
       ></div>
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col overflow-hidden">
         <div style={{ height: 45, width: '100%', backgroundColor: 'black' }}>
           Board Utility
         </div>
@@ -107,8 +123,8 @@ const BoardPage: FC<any> = () => {
             >
               {(provided) => (
                 <div {...provided.droppableProps} ref={provided.innerRef}>
-                  {board.lists.map((list, index) => (
-                    <Column key={list.id} index={index} list={list}></Column>
+                  {board.listItemIds.map((listId, index) => (
+                    <Column key={listId} index={index} listId={listId}></Column>
                   ))}
                   {provided.placeholder}
                 </div>

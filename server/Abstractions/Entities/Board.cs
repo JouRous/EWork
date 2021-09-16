@@ -11,5 +11,6 @@ namespace Abstractions.Entities
     public string Name { get; set; }
     public Guid ProjectId { get; set; }
     public Project Project { get; set; }
+    public ICollection<List> Lists { get; set; }
   }
 }

@@ -1,10 +1,13 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Abstractions.Entities;
 using Abstractions.ViewModels;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.Controllers
 {
@@ -24,7 +27,10 @@ namespace Api.Controllers
     [HttpGet("{id}")]
     public async Task<ActionResult> GetById(Guid id)
     {
-      var board = await _boardRepository.FirstOrDefaultAsync(id);
+      var board = await _boardRepository.Query(board => board.Id == id)
+        .Include(b => b.Lists)
+        .ProjectTo<BoardGetResult>(_mapper.ConfigurationProvider)
+        .FirstOrDefaultAsync();
       return Ok(board);
     }
 

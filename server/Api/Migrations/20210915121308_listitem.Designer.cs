@@ -3,15 +3,17 @@ using System;
 using Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210915121308_listitem")]
+    partial class listitem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,8 +72,6 @@ namespace Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BoardId");
-
                     b.ToTable("Lists");
                 });
 
@@ -119,11 +119,11 @@ namespace Api.Migrations
                     b.Property<Guid>("ListId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
                     b.Property<int>("Pos")
                         .HasColumnType("integer");
+
+                    b.Property<string>("TicketName")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
@@ -132,7 +132,7 @@ namespace Api.Migrations
 
                     b.HasIndex("ListId");
 
-                    b.ToTable("Tickets");
+                    b.ToTable("Ticket");
                 });
 
             modelBuilder.Entity("Abstractions.Entities.User", b =>
@@ -190,19 +190,10 @@ namespace Api.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("Abstractions.Entities.List", b =>
-                {
-                    b.HasOne("Abstractions.Entities.Board", null)
-                        .WithMany("Lists")
-                        .HasForeignKey("BoardId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Abstractions.Entities.Ticket", b =>
                 {
                     b.HasOne("Abstractions.Entities.List", null)
-                        .WithMany("Tickets")
+                        .WithMany("ListTickets")
                         .HasForeignKey("ListId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -227,14 +218,9 @@ namespace Api.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Abstractions.Entities.Board", b =>
-                {
-                    b.Navigation("Lists");
-                });
-
             modelBuilder.Entity("Abstractions.Entities.List", b =>
                 {
-                    b.Navigation("Tickets");
+                    b.Navigation("ListTickets");
                 });
 
             modelBuilder.Entity("Abstractions.Entities.Project", b =>

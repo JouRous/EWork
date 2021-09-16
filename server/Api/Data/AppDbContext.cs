@@ -20,5 +20,7 @@ namespace Api.Data
     public DbSet<Project> Projects { get; set; }
     public DbSet<UserProject> UserProjects { get; set; }
     public DbSet<Board> Boards { get; set; }
+    public DbSet<List> Lists { get; set; }
+    public DbSet<Ticket> Tickets { get; set; }
   }
 }

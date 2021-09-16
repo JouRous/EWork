@@ -1,14 +1,15 @@
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { Ticket } from 'components/Ticket';
 import { IList } from '../../models/IList';
+import http from 'services/http-service';
 
 const Container = styled.div`
   box-sizing: border-box;
   display: inline-block;
-  height: 100%;
   margin: 0 4px;
+  height: calc(100vh - 100px);
   vertical-align: top;
   white-space: nowrap;
   width: 272px;
@@ -26,13 +27,22 @@ const ColumnContent = styled.div`
 `;
 
 interface IProps {
-  list: IList;
+  listId: string;
   index: number;
 }
 
-export const Column: FC<IProps> = ({ list, index }) => {
+export const Column: FC<IProps> = ({ listId, index }) => {
+  const listInit = { id: '', name: '', tickets: [] } as IList;
+  const [list, setList] = useState<IList>(listInit);
+
+  useEffect(() => {
+    http
+      .get<IList>(`/api/v1/listitem/${listId}`)
+      .subscribe((data) => setList(data));
+  }, [listId]);
+
   return (
-    <Draggable draggableId={list.id} index={index}>
+    <Draggable draggableId={listId} index={index}>
       {(provided) => (
         <Container
           ref={provided.innerRef}
@@ -42,7 +52,7 @@ export const Column: FC<IProps> = ({ list, index }) => {
         >
           <ColumnContent>
             <div>{list.name}</div>
-            <Droppable droppableId={list.id}>
+            <Droppable droppableId={listId}>
               {(provided) => (
                 <div ref={provided.innerRef} {...provided.droppableProps}>
                   {list.tickets.map((ticket, index) => (
