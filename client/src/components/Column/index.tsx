@@ -1,8 +1,9 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import styled from 'styled-components';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { Ticket } from 'components/Ticket';
 import { IList } from '../../models/IList';
+import { ITicket } from 'models/ITicket';
 
 const Container = styled.div`
   box-sizing: border-box;
@@ -38,12 +39,56 @@ const ListTitle = styled.div`
   transition: color 85ms ease-in;
 `;
 
+const AddCardButton = styled.button`
+  display: block;
+  cursor: pointer;
+  background-color: transparent;
+  width: 100%;
+  font-size: 14px;
+  color: #5e6c84;
+  font-weight: 600;
+  padding: 6px 8px;
+  transition: color 85ms ease-in;
+`;
+
+const AddCardForm = styled.div`
+  background-color: #fff;
+  border-radius: 3px;
+  box-shadow: 0 1px 0 #091e4240;
+  cursor: pointer;
+  display: block;
+  margin-bottom: 8px;
+  max-width: 300px;
+  min-height: 20px;
+  position: relative;
+  text-decoration: none;
+  z-index: 0;
+`;
+
+const Input = styled.textarea`
+  overflow: hidden;
+  overflow-wrap: break-word;
+  resize: none;
+  height: 54px;
+  width: 100%;
+  color: #172b4d;
+  border: unset;
+
+  &:focus {
+    box-shadow: none;
+    outline: none;
+  }
+`;
+
 interface IProps {
   list: IList;
   index: number;
+  addTicket: (ticket: ITicket) => void;
 }
 
 export const Column: FC<IProps> = ({ list, index }) => {
+  const [isToggle, setIsToggle] = useState(false);
+
   return (
     <Draggable draggableId={list.id} index={index}>
       {(provided) => (
@@ -65,6 +110,37 @@ export const Column: FC<IProps> = ({ list, index }) => {
                 </div>
               )}
             </Droppable>
+
+            {isToggle ? (
+              <div>
+                <AddCardForm className="px-2 pt-1">
+                  <Input placeholder="Enter card title..." />
+                </AddCardForm>
+                <div>
+                  <div>
+                    <button
+                      className="px-2 py-1 rounded"
+                      style={{
+                        backgroundColor: '#0079bf',
+                        border: 'none',
+                        boxShadow: 'none',
+                        color: '#fff',
+                      }}
+                    >
+                      Add card
+                    </button>
+                    <button onClick={() => setIsToggle(false)}>X</button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <AddCardButton
+                onClick={() => setIsToggle(true)}
+                className="text-left"
+              >
+                Add another card
+              </AddCardButton>
+            )}
           </ColumnContent>
         </Container>
       )}

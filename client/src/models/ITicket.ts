@@ -1,6 +1,7 @@
-export interface ITicket {
+import { IMoveable } from './IMoveable';
+
+export interface ITicket extends IMoveable {
   id: string;
   name: string;
-  pos: string;
   listId: string;
 }

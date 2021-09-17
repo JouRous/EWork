@@ -1,8 +1,8 @@
+import { IMoveable } from './IMoveable';
 import { ITicket } from './ITicket';
 
-export interface IList {
+export interface IList extends IMoveable {
   id: string;
   name: string;
-  pos: string;
   tickets: ITicket[];
 }

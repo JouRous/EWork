@@ -2,18 +2,20 @@ import { Column } from 'components/Column';
 import { CreateBoardColumn } from 'components/CreateListColumn';
 import { IBoard } from 'models/IBoard';
 import { IList } from 'models/IList';
+import { ITicket } from 'models/ITicket';
 import { FC, useEffect, useState } from 'react';
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import { useRouteMatch } from 'react-router';
 import { forkJoin, map, mergeAll, toArray } from 'rxjs';
 import http from 'services/http-service';
-import { getPos } from 'utils';
+import { moveItem, reorder } from './board-utils';
 
 const BoardPage: FC<any> = () => {
   const background =
     'https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2239x1600/9cd9d9e923c9fa0cb96ac27418fad55c/photo-1630980260348-16f484cb6471.jpg';
   const boardInit = { id: '', name: '', lists: [] } as IBoard;
   const [board, setBoard] = useState(boardInit);
+  const [loading, setLoading] = useState(true);
   const match = useRouteMatch<{ id: string }>();
 
   useEffect(() => {
@@ -39,12 +41,20 @@ const BoardPage: FC<any> = () => {
           const lists = response[1];
           board.lists = lists;
           setBoard(board);
+          setLoading(false);
         }
       );
     }
 
     fetchBoard();
-  }, [match]);
+  }, [match, loading]);
+
+  const addTicket = (ticket: ITicket) => {
+    http.post(`/api/v1/ticket`, ticket).subscribe((data) => {
+      console.log(data);
+      setLoading(true);
+    });
+  };
 
   const onDragEnd = (result: DropResult) => {
     const { destination, source, draggableId, type } = result;
@@ -61,33 +71,20 @@ const BoardPage: FC<any> = () => {
     }
 
     if (type === 'list') {
-      const newListOrder = [...board.lists];
-      const movedList = board.lists[source.index];
-      newListOrder.splice(source.index, 1);
-      newListOrder.splice(destination.index, 0, movedList);
-      const leftList = newListOrder[destination.index - 1];
-      const rightList = newListOrder[destination.index + 1];
-
-      switch (destination.index) {
-        case 0:
-          movedList.pos = getPos('', rightList.pos);
-          break;
-        case newListOrder.length - 1:
-          movedList.pos = getPos(leftList.pos, '');
-          break;
-        default:
-          movedList.pos = getPos(leftList.pos, rightList.pos);
-          break;
-      }
+      const [movedItem, newList] = reorder<IList>(
+        board.lists,
+        source.index,
+        destination.index
+      );
 
       const newBoard = {
         ...board,
-        lists: newListOrder,
+        lists: newList,
       };
 
       http
         .post<{ pos: number }>(`/api/v1/listitem/${draggableId}/pos`, {
-          pos: movedList.pos,
+          pos: movedItem.pos,
         })
         .subscribe((data) => data);
       setBoard(newBoard);
@@ -107,30 +104,17 @@ const BoardPage: FC<any> = () => {
         return;
       }
 
-      const newListTicket = [...list.tickets];
-      const moveTicket = newListTicket[source.index];
-      newListTicket.splice(source.index, 1);
-      newListTicket.splice(destination.index, 0, moveTicket);
-      const topTicket = newListTicket[destination.index - 1];
-      const bottomTicket = newListTicket[destination.index + 1];
-
-      switch (destination.index) {
-        case 0:
-          moveTicket.pos = getPos('', bottomTicket.pos);
-          break;
-        case newListTicket.length - 1:
-          moveTicket.pos = getPos(topTicket.pos, '');
-          break;
-        default:
-          moveTicket.pos = getPos(topTicket.pos, bottomTicket.pos);
-          break;
-      }
+      const [movedTicket, newListTicket] = reorder<ITicket>(
+        list.tickets,
+        source.index,
+        destination.index
+      );
 
       list.tickets = newListTicket;
 
       http
         .post(`/api/v1/ticket/${draggableId}/move`, {
-          pos: moveTicket.pos,
+          pos: movedTicket.pos,
         })
         .subscribe((_) => {});
       setBoard(newBoard);
@@ -147,26 +131,14 @@ const BoardPage: FC<any> = () => {
       );
 
       if (destList && sourceList) {
-        const newDestTickets = [...destList.tickets];
-        const newSourceTickets = [...sourceList.tickets];
-        const movedTicket = newSourceTickets[source.index];
-        const firstTicket = destList.tickets[0];
-        const lastTicket = destList.tickets[destList.tickets.length - 1];
+        const [movedTicket, newSource, newDest] = moveItem<ITicket>(
+          sourceList.tickets,
+          destList.tickets,
+          source,
+          destination
+        );
 
-        newDestTickets.splice(destination.index, 0, movedTicket);
-        newSourceTickets.splice(source.index, 1);
-
-        if (destination.index === 0) {
-          if (newDestTickets.length > 1) {
-            movedTicket.pos = getPos('', firstTicket.pos);
-          } else {
-            movedTicket.pos = getPos('', '');
-          }
-        } else if (destination.index === newDestTickets.length - 1) {
-          movedTicket.pos = getPos(lastTicket.pos, '');
-        } else {
-          movedTicket.pos = getPos(firstTicket.pos, lastTicket.pos);
-        }
+        console.log(movedTicket);
 
         http
           .post(`/api/v1/ticket/${draggableId}/move`, {
@@ -175,8 +147,8 @@ const BoardPage: FC<any> = () => {
           })
           .subscribe((_) => {});
 
-        destList.tickets = newDestTickets;
-        sourceList.tickets = newSourceTickets;
+        destList.tickets = newDest;
+        sourceList.tickets = newSource;
 
         setBoard(newBoard);
       }
@@ -209,7 +181,12 @@ const BoardPage: FC<any> = () => {
               {(provided) => (
                 <div {...provided.droppableProps} ref={provided.innerRef}>
                   {board.lists.map((list, index) => (
-                    <Column key={list.id} index={index} list={list}></Column>
+                    <Column
+                      key={list.id}
+                      index={index}
+                      list={list}
+                      addTicket={addTicket}
+                    ></Column>
                   ))}
                   {provided.placeholder}
                 </div>
