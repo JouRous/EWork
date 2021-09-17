@@ -10,7 +10,8 @@ namespace Abstractions.Entities
   {
     public string Name { get; set; }
     public string Content { get; set; }
-    public int Pos { get; set; }
+    public string Pos { get; set; }
     public Guid ListId { get; set; }
+    public List List { get; set; }
   }
 }

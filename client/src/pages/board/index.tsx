@@ -1,9 +1,13 @@
 import { Column } from 'components/Column';
+import { CreateBoardColumn } from 'components/CreateListColumn';
 import { IBoard } from 'models/IBoard';
+import { IList } from 'models/IList';
 import { FC, useEffect, useState } from 'react';
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import { useRouteMatch } from 'react-router';
+import { forkJoin, map, mergeAll, toArray } from 'rxjs';
 import http from 'services/http-service';
+import { getPos } from 'utils';
 
 const BoardPage: FC<any> = () => {
   const background =
@@ -15,9 +19,28 @@ const BoardPage: FC<any> = () => {
   useEffect(() => {
     function fetchBoard() {
       const boardId = match.params.id;
-      http.get<IBoard>(`/api/v1/board/${boardId}`).subscribe((data) => {
-        setBoard(data);
-      });
+      const fetchBoardRequest = http.get<IBoard>(`/api/v1/board/${boardId}`);
+      const fetchTicketsRequest = http
+        .get<IList[]>(`/api/v1/board/${boardId}/lists`)
+        .pipe(
+          mergeAll(),
+          map((list) => ({
+            ...list,
+            tickets: list.tickets.sort(
+              (a, b) => a.pos.charCodeAt(0) - b.pos.charCodeAt(0)
+            ),
+          })),
+          toArray()
+        );
+
+      forkJoin([fetchBoardRequest, fetchTicketsRequest]).subscribe(
+        (response) => {
+          const board = response[0];
+          const lists = response[1];
+          board.lists = lists;
+          setBoard(board);
+        }
+      );
     }
 
     fetchBoard();
@@ -25,7 +48,6 @@ const BoardPage: FC<any> = () => {
 
   const onDragEnd = (result: DropResult) => {
     const { destination, source, draggableId, type } = result;
-    console.log(draggableId);
 
     if (!destination) {
       return;
@@ -43,26 +65,18 @@ const BoardPage: FC<any> = () => {
       const movedList = board.lists[source.index];
       newListOrder.splice(source.index, 1);
       newListOrder.splice(destination.index, 0, movedList);
-
-      // if (destination.index === 0) {
-      //   movedList.pos = newListOrder[destination.index + 1].pos - 1024;
-      // } else if (destination.index === newListOrder.length - 1) {
-      //   movedList.pos = newListOrder[destination.index].pos + 4096;
-      // } else {
-      // }
+      const leftList = newListOrder[destination.index - 1];
+      const rightList = newListOrder[destination.index + 1];
 
       switch (destination.index) {
         case 0:
-          movedList.pos = newListOrder[destination.index + 1].pos - 1024;
+          movedList.pos = getPos('', rightList.pos);
           break;
         case newListOrder.length - 1:
-          movedList.pos = newListOrder[destination.index].pos + 4096;
+          movedList.pos = getPos(leftList.pos, '');
           break;
         default:
-          movedList.pos =
-            (newListOrder[destination.index - 1].pos +
-              newListOrder[destination.index + 1].pos) /
-            2;
+          movedList.pos = getPos(leftList.pos, rightList.pos);
           break;
       }
 
@@ -97,9 +111,28 @@ const BoardPage: FC<any> = () => {
       const moveTicket = newListTicket[source.index];
       newListTicket.splice(source.index, 1);
       newListTicket.splice(destination.index, 0, moveTicket);
+      const topTicket = newListTicket[destination.index - 1];
+      const bottomTicket = newListTicket[destination.index + 1];
+
+      switch (destination.index) {
+        case 0:
+          moveTicket.pos = getPos('', bottomTicket.pos);
+          break;
+        case newListTicket.length - 1:
+          moveTicket.pos = getPos(topTicket.pos, '');
+          break;
+        default:
+          moveTicket.pos = getPos(topTicket.pos, bottomTicket.pos);
+          break;
+      }
 
       list.tickets = newListTicket;
 
+      http
+        .post(`/api/v1/ticket/${draggableId}/move`, {
+          pos: moveTicket.pos,
+        })
+        .subscribe((_) => {});
       setBoard(newBoard);
     } else {
       const newBoard = {
@@ -114,12 +147,33 @@ const BoardPage: FC<any> = () => {
       );
 
       if (destList && sourceList) {
-        const movedTicket = sourceList.tickets[source.index];
-        const newDestTickets = destList.tickets;
-        const newSourceTickets = sourceList.tickets;
+        const newDestTickets = [...destList.tickets];
+        const newSourceTickets = [...sourceList.tickets];
+        const movedTicket = newSourceTickets[source.index];
+        const firstTicket = destList.tickets[0];
+        const lastTicket = destList.tickets[destList.tickets.length - 1];
 
         newDestTickets.splice(destination.index, 0, movedTicket);
         newSourceTickets.splice(source.index, 1);
+
+        if (destination.index === 0) {
+          if (newDestTickets.length > 1) {
+            movedTicket.pos = getPos('', firstTicket.pos);
+          } else {
+            movedTicket.pos = getPos('', '');
+          }
+        } else if (destination.index === newDestTickets.length - 1) {
+          movedTicket.pos = getPos(lastTicket.pos, '');
+        } else {
+          movedTicket.pos = getPos(firstTicket.pos, lastTicket.pos);
+        }
+
+        http
+          .post(`/api/v1/ticket/${draggableId}/move`, {
+            pos: movedTicket.pos,
+            listId: destination.droppableId,
+          })
+          .subscribe((_) => {});
 
         destList.tickets = newDestTickets;
         sourceList.tickets = newSourceTickets;
@@ -131,7 +185,11 @@ const BoardPage: FC<any> = () => {
 
   return (
     <div
-      style={{ backgroundImage: `url(${background})` }}
+      style={{
+        backgroundImage: `url(${background})`,
+        backgroundPosition: '50%',
+        backgroundSize: 'cover',
+      }}
       className="h-screen w-screen flex flex-col"
     >
       <div
@@ -141,7 +199,7 @@ const BoardPage: FC<any> = () => {
         <div style={{ height: 45, width: '100%', backgroundColor: 'black' }}>
           Board Utility
         </div>
-        <div className="flex-1">
+        <div className="flex-1 flex">
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable
               droppableId="all-lists"
@@ -158,6 +216,7 @@ const BoardPage: FC<any> = () => {
               )}
             </Droppable>
           </DragDropContext>
+          <CreateBoardColumn />
         </div>
       </div>
     </div>

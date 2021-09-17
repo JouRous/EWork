@@ -46,5 +46,25 @@ namespace Api.Controllers
         Message = "Success"
       });
     }
+
+    [HttpPost("{id}/move")]
+    public async Task<ActionResult> UpdatePos(Guid id, MoveTicketParams moveTicketParams)
+    {
+      var ticket = await _ticketRepository.FirstOrDefaultAsync(id);
+      ticket.Pos = moveTicketParams.Pos;
+
+      if (moveTicketParams.ListId != Guid.Empty)
+      {
+        ticket.ListId = moveTicketParams.ListId;
+      }
+
+      await _ticketRepository.SaveChangesAsync();
+
+      return Ok(new
+      {
+        StatusCode = 200,
+        Message = "Success"
+      });
+    }
   }
 }

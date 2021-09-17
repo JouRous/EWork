@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Abstractions.Entities;
@@ -14,13 +15,19 @@ namespace Api.Controllers
   public class BoardController : BaseController
   {
     private readonly IRepository<Board> _boardRepository;
+    private readonly IRepository<Ticket> _ticketRepository;
+    private readonly IRepository<List> _listRepository;
     private readonly IMapper _mapper;
 
     public BoardController(
       IRepository<Board> boardRepository,
+      IRepository<Ticket> ticketRepository,
+      IRepository<List> listRepository,
       IMapper mapper)
     {
       _boardRepository = boardRepository;
+      _ticketRepository = ticketRepository;
+      _listRepository = listRepository;
       _mapper = mapper;
     }
 
@@ -38,13 +45,31 @@ namespace Api.Controllers
     [HttpGet("{id}/tickets")]
     public async Task<ActionResult> GetTicketsInBoard(Guid id)
     {
-      var tickets = await _boardRepository.Query(b => b.Id == id)
-        .Include(b => b.Lists.OrderByDescending(l => l.Pos))
-        .ThenInclude(l => l.Tickets)
-        .Select(x => x.Lists.Select(l => l.Tickets))
+      var tickets = await _ticketRepository.Query()
+        .Include(t => t.List)
+        .ThenInclude(l => l.Board)
+        .Where(x => x.List.BoardId == id)
+        .ProjectTo<TicketGetResult>(_mapper.ConfigurationProvider)
         .ToListAsync();
 
       return Ok(tickets);
+    }
+
+    [HttpGet("{id}/lists")]
+    public async Task<ActionResult> GetListItems(Guid id)
+    {
+      var lists = await _listRepository.Query(x => x.BoardId == id)
+        .Include(l => l.Tickets.OrderBy(t => t.Pos))
+        .OrderBy(l => l.Pos)
+        .ProjectTo<ListGetResult>(_mapper.ConfigurationProvider)
+        .ToListAsync();
+
+      foreach (var list in lists)
+      {
+        list.Tickets = list.Tickets.OrderBy(x => x.Pos).ToList();
+      }
+
+      return Ok(lists);
     }
 
     [HttpPost]

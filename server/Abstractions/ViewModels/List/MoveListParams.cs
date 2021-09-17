@@ -2,6 +2,6 @@ namespace Abstractions.ViewModels
 {
   public class MoveListParams
   {
-    public double Pos { get; set; }
+    public string Pos { get; set; }
   }
 }

@@ -79,7 +79,7 @@ namespace Api
       app.UseSwaggerUI(options =>
       {
         // c.SwaggerEndpoint("/swagger/v1/swagger.json", "Api v1");
-        // c.RoutePrefix = string.Empty;
+        options.RoutePrefix = string.Empty;
         foreach (var description in provider.ApiVersionDescriptions)
         {
           options.SwaggerEndpoint(

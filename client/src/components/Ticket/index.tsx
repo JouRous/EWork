@@ -1,6 +1,21 @@
 import { FC } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
+import styled from 'styled-components';
 import { ITicket } from '../../models/ITicket';
+
+const Wrapper = styled.div`
+  background-color: #fff;
+  border-radius: 3px;
+  box-shadow: 0 1px 0 #091e4240;
+  cursor: pointer;
+  display: block;
+  margin-bottom: 8px;
+  max-width: 300px;
+  min-height: 20px;
+  position: relative;
+  text-decoration: none;
+  z-index: 0;
+`;
 
 interface IProps {
   ticket: ITicket;
@@ -11,14 +26,14 @@ export const Ticket: FC<IProps> = ({ ticket, index }) => {
   return (
     <Draggable draggableId={ticket.id} index={index}>
       {(provided) => (
-        <div
+        <Wrapper
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          className="select-none"
+          className="select-none rounded px-2 py-1"
         >
           {ticket.name}
-        </div>
+        </Wrapper>
       )}
     </Draggable>
   );

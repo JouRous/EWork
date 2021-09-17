@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Abstractions.Entities;
 using Abstractions.ViewModels;
 using AutoMapper;
@@ -10,7 +12,7 @@ namespace Application.Mapper
     {
       CreateMap<List, CreateListParams>().ReverseMap();
 
-      CreateMap<List, ListGetResult>().ReverseMap();
+      CreateMap<List, ListGetResult>();
     }
   }
 }

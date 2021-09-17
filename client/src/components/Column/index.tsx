@@ -1,15 +1,14 @@
-import { FC, useEffect, useState } from 'react';
+import { FC } from 'react';
 import styled from 'styled-components';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { Ticket } from 'components/Ticket';
 import { IList } from '../../models/IList';
-import http from 'services/http-service';
-import { ITicket } from 'models/ITicket';
 
 const Container = styled.div`
   box-sizing: border-box;
   display: inline-block;
   margin: 0 4px;
+  padding: 4px;
   height: calc(100vh - 100px);
   vertical-align: top;
   white-space: nowrap;
@@ -27,20 +26,24 @@ const ColumnContent = styled.div`
   white-space: normal;
 `;
 
+const ListTitle = styled.div`
+  display: block;
+  cursor: pointer;
+  background-color: transparent;
+  width: 100%;
+  font-size: 14px;
+  color: #172b4d;
+  font-weight: 600;
+  padding: 6px 8px;
+  transition: color 85ms ease-in;
+`;
+
 interface IProps {
   list: IList;
   index: number;
 }
 
 export const Column: FC<IProps> = ({ list, index }) => {
-  const [tickets, setTickets] = useState<ITicket[]>([]);
-
-  useEffect(() => {
-    http
-      .get<ITicket[]>(`/api/v1/listitem/${list.id}/tickets`)
-      .subscribe((data) => setTickets(data));
-  }, [list]);
-
   return (
     <Draggable draggableId={list.id} index={index}>
       {(provided) => (
@@ -50,12 +53,12 @@ export const Column: FC<IProps> = ({ list, index }) => {
           {...provided.dragHandleProps}
           className="flex"
         >
-          <ColumnContent>
-            <div>{list.name}</div>
+          <ColumnContent className="p-3">
+            <ListTitle>{list.name}</ListTitle>
             <Droppable droppableId={list.id}>
               {(provided) => (
                 <div ref={provided.innerRef} {...provided.droppableProps}>
-                  {tickets.map((ticket, index) => (
+                  {list.tickets.map((ticket, index) => (
                     <Ticket key={ticket.id} ticket={ticket} index={index} />
                   ))}
                   {provided.placeholder}

@@ -1,0 +1,1 @@
+export { getPos } from './indexing';
