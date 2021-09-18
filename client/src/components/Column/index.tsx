@@ -98,7 +98,7 @@ export const Column: FC<IProps> = ({ list, index, addTicket }) => {
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          className="flex"
+          className="flex flex-shrink-0"
         >
           <ColumnContent className="p-3">
             <ListTitle>{list.name}</ListTitle>

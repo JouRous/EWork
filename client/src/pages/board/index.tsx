@@ -52,7 +52,6 @@ const BoardPage: FC<any> = () => {
 
   const addTicket = (ticket: any) => {
     http.post(`/api/v1/ticket`, ticket).subscribe((data) => {
-      console.log(data);
       setLoading(true);
     });
   };
@@ -175,39 +174,37 @@ const BoardPage: FC<any> = () => {
         backgroundPosition: '50%',
         backgroundSize: 'cover',
       }}
-      className="h-screen w-screen flex flex-col"
+      className="h-screen flex flex-col"
     >
       <div
         style={{ backgroundColor: 'transparent', height: 45, width: '100%' }}
       ></div>
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="">
         <div style={{ height: 45, width: '100%', backgroundColor: 'black' }}>
           Board Utility
         </div>
-        <div className="flex-1 flex">
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable
-              droppableId="all-lists"
-              type="list"
-              direction="horizontal"
-            >
-              {(provided) => (
-                <div {...provided.droppableProps} ref={provided.innerRef}>
-                  {board.lists.map((list, index) => (
-                    <Column
-                      key={list.id}
-                      index={index}
-                      list={list}
-                      addTicket={addTicket}
-                    ></Column>
-                  ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
-          <CreateBoardColumn addList={addList} />
-        </div>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="all-lists" type="list" direction="horizontal">
+            {(provided) => (
+              <div
+                className="flex overflow-auto"
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+              >
+                {board.lists.map((list, index) => (
+                  <Column
+                    key={list.id}
+                    index={index}
+                    list={list}
+                    addTicket={addTicket}
+                  ></Column>
+                ))}
+                {provided.placeholder}
+                <CreateBoardColumn addList={addList} />
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
       </div>
     </div>
   );
