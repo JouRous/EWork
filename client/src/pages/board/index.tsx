@@ -8,6 +8,7 @@ import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import { useRouteMatch } from 'react-router';
 import { forkJoin, map, mergeAll, toArray } from 'rxjs';
 import http from 'services/http-service';
+import { getPos } from 'utils';
 import { moveItem, reorder } from './board-utils';
 
 const BoardPage: FC<any> = () => {
@@ -49,11 +50,25 @@ const BoardPage: FC<any> = () => {
     fetchBoard();
   }, [match, loading]);
 
-  const addTicket = (ticket: ITicket) => {
+  const addTicket = (ticket: any) => {
     http.post(`/api/v1/ticket`, ticket).subscribe((data) => {
       console.log(data);
       setLoading(true);
     });
+  };
+
+  const addList = (list: any) => {
+    const lastList = board.lists[board.lists.length - 1];
+    const prevPos = lastList ? lastList.pos : '';
+    http
+      .post(`/api/v1/listitem`, {
+        name: list.name,
+        boardId: board.id,
+        pos: getPos(prevPos, ''),
+      })
+      .subscribe((data) => {
+        setLoading(true);
+      });
   };
 
   const onDragEnd = (result: DropResult) => {
@@ -138,8 +153,6 @@ const BoardPage: FC<any> = () => {
           destination
         );
 
-        console.log(movedTicket);
-
         http
           .post(`/api/v1/ticket/${draggableId}/move`, {
             pos: movedTicket.pos,
@@ -193,7 +206,7 @@ const BoardPage: FC<any> = () => {
               )}
             </Droppable>
           </DragDropContext>
-          <CreateBoardColumn />
+          <CreateBoardColumn addList={addList} />
         </div>
       </div>
     </div>

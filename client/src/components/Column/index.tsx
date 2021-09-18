@@ -3,7 +3,8 @@ import styled from 'styled-components';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { Ticket } from 'components/Ticket';
 import { IList } from '../../models/IList';
-import { ITicket } from 'models/ITicket';
+import { useForm } from 'react-hook-form';
+import { getPos } from 'utils';
 
 const Container = styled.div`
   box-sizing: border-box;
@@ -83,11 +84,12 @@ const Input = styled.textarea`
 interface IProps {
   list: IList;
   index: number;
-  addTicket: (ticket: ITicket) => void;
+  addTicket: (ticket: any) => void;
 }
 
-export const Column: FC<IProps> = ({ list, index }) => {
+export const Column: FC<IProps> = ({ list, index, addTicket }) => {
   const [isToggle, setIsToggle] = useState(false);
+  const { register, handleSubmit, reset } = useForm();
 
   return (
     <Draggable draggableId={list.id} index={index}>
@@ -114,7 +116,10 @@ export const Column: FC<IProps> = ({ list, index }) => {
             {isToggle ? (
               <div>
                 <AddCardForm className="px-2 pt-1">
-                  <Input placeholder="Enter card title..." />
+                  <Input
+                    {...register('name')}
+                    placeholder="Enter card title..."
+                  />
                 </AddCardForm>
                 <div>
                   <div>
@@ -126,10 +131,25 @@ export const Column: FC<IProps> = ({ list, index }) => {
                         boxShadow: 'none',
                         color: '#fff',
                       }}
+                      onClick={handleSubmit((data: { name: string }) => {
+                        const bottomTicket =
+                          list.tickets[list.tickets.length - 1];
+                        const prevPos = bottomTicket ? bottomTicket.pos : '';
+
+                        addTicket({
+                          name: data.name,
+                          listId: list.id,
+                          pos: getPos(prevPos, ''),
+                        });
+                        setIsToggle(false);
+                        reset({ name: '' });
+                      })}
                     >
                       Add card
                     </button>
-                    <button onClick={() => setIsToggle(false)}>X</button>
+                    <button className="ml-3" onClick={() => setIsToggle(false)}>
+                      X
+                    </button>
                   </div>
                 </div>
               </div>
