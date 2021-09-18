@@ -5,6 +5,7 @@ import styled from 'styled-components';
 const Wrapper = styled.div`
   box-sizing: border-box;
   display: inline-block;
+  flex-shrink: 0;
   margin: 0 4px;
   vertical-align: top;
   white-space: nowrap;
