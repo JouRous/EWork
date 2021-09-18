@@ -174,38 +174,36 @@ const BoardPage: FC<any> = () => {
         backgroundPosition: '50%',
         backgroundSize: 'cover',
       }}
-      className="h-screen flex flex-col"
+      className="h-screen overflow-y-hidden"
     >
       <div
         style={{ backgroundColor: 'transparent', height: 45, width: '100%' }}
       ></div>
-      <div className="">
-        <div style={{ height: 45, width: '100%', backgroundColor: 'black' }}>
-          Board Utility
-        </div>
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="all-lists" type="list" direction="horizontal">
-            {(provided) => (
-              <div
-                className="flex overflow-auto"
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-              >
-                {board.lists.map((list, index) => (
-                  <Column
-                    key={list.id}
-                    index={index}
-                    list={list}
-                    addTicket={addTicket}
-                  ></Column>
-                ))}
-                {provided.placeholder}
-                <CreateBoardColumn addList={addList} />
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
+      <div style={{ height: 45, width: '100%', backgroundColor: 'black' }}>
+        Board Utility
       </div>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="all-lists" type="list" direction="horizontal">
+          {(provided) => (
+            <div
+              className="flex"
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
+              {board.lists.map((list, index) => (
+                <Column
+                  key={list.id}
+                  index={index}
+                  list={list}
+                  addTicket={addTicket}
+                ></Column>
+              ))}
+              {provided.placeholder}
+              <CreateBoardColumn addList={addList} />
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
     </div>
   );
 };

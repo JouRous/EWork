@@ -42,7 +42,6 @@ const AddForm = styled.div`
 `;
 
 const Input = styled.input`
-  overflow: hidden;
   overflow-wrap: break-word;
   resize: none;
   /* height: 54px; */

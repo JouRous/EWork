@@ -67,7 +67,6 @@ const AddCardForm = styled.div`
 `;
 
 const Input = styled.textarea`
-  overflow: hidden;
   overflow-wrap: break-word;
   resize: none;
   height: 54px;
@@ -104,7 +103,11 @@ export const Column: FC<IProps> = ({ list, index, addTicket }) => {
             <ListTitle>{list.name}</ListTitle>
             <Droppable droppableId={list.id}>
               {(provided) => (
-                <div ref={provided.innerRef} {...provided.droppableProps}>
+                <div
+                  style={{ minHeight: 8 }}
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                >
                   {list.tickets.map((ticket, index) => (
                     <Ticket key={ticket.id} ticket={ticket} index={index} />
                   ))}
