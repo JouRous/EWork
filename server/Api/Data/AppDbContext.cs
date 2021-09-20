@@ -14,6 +14,7 @@ namespace Api.Data
       base.OnModelCreating(modelBuilder);
 
       modelBuilder.Entity<UserProject>().HasKey(src => new { src.UserId, src.ProjectId });
+      modelBuilder.Entity<UserBoard>().HasKey(src => new { src.UserId, src.BoardId });
     }
 
     public DbSet<User> Users { get; set; }

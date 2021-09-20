@@ -50,7 +50,7 @@ namespace Api.Controllers
 
       return Ok(new
       {
-        user = _mapper.Map<UserGetResult>(user),
+        user = _mapper.Map<UserDetailDto>(user),
         token = _tokenService.generateJwtToken(user)
       });
     }

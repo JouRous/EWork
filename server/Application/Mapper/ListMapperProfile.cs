@@ -13,6 +13,7 @@ namespace Application.Mapper
       CreateMap<List, CreateListParams>().ReverseMap();
 
       CreateMap<List, ListGetResult>();
+      CreateMap<List, ListGetResultWithTicket>();
     }
   }
 }

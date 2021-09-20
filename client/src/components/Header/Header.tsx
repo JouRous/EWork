@@ -14,7 +14,7 @@ export const Header: FC<IProps> = ({ user }) => {
   return (
     <div
       className="fixed w-full top-0"
-      style={{ backgroundColor: 'rgba(0,0,0,0.1)', height: 45, zIndex: 100 }}
+      style={{ backgroundColor: 'rgba(0,0,0,0.3)', height: 45, zIndex: 100 }}
       // style={{ backgroundColor: '#026AA7', height: 45, zIndex: 100 }}
     >
       <div className="flex justify-between items-center px-2 py-1 text-white">

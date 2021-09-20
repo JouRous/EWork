@@ -1,5 +1,7 @@
+import { BoardHeader } from 'components/BoardHeader';
 import { Column } from 'components/Column';
 import { CreateBoardColumn } from 'components/CreateListColumn';
+import { InviteModal } from 'components/InviteModal';
 import { IBoard } from 'models/IBoard';
 import { IList } from 'models/IList';
 import { ITicket } from 'models/ITicket';
@@ -8,13 +10,36 @@ import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import { useRouteMatch } from 'react-router';
 import { forkJoin, map, mergeAll, toArray } from 'rxjs';
 import http from 'services/http-service';
+import styled from 'styled-components';
 import { getPos } from 'utils';
 import { moveItem, reorder } from './board-utils';
+
+const Container = styled.div`
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 12px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #bfc4ce;
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+  }
+`;
 
 const BoardPage: FC<any> = () => {
   const background =
     'https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2239x1600/9cd9d9e923c9fa0cb96ac27418fad55c/photo-1630980260348-16f484cb6471.jpg';
-  const boardInit = { id: '', name: '', lists: [] } as IBoard;
+  const boardInit = {
+    id: '',
+    name: '',
+    lists: [],
+    members: [],
+  } as IBoard;
   const [board, setBoard] = useState(boardInit);
   const [loading, setLoading] = useState(true);
   const match = useRouteMatch<{ id: string }>();
@@ -41,6 +66,7 @@ const BoardPage: FC<any> = () => {
           const board = response[0];
           const lists = response[1];
           board.lists = lists;
+
           setBoard(board);
           setLoading(false);
         }
@@ -168,7 +194,7 @@ const BoardPage: FC<any> = () => {
   };
 
   return (
-    <div
+    <Container
       style={{
         backgroundImage: `url(${background})`,
         backgroundPosition: '50%',
@@ -179,14 +205,13 @@ const BoardPage: FC<any> = () => {
       <div
         style={{ backgroundColor: 'transparent', height: 45, width: '100%' }}
       ></div>
-      <div style={{ height: 45, width: '100%', backgroundColor: 'black' }}>
-        Board Utility
-      </div>
+      <BoardHeader boardName={board.name} members={board.members} />
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="all-lists" type="list" direction="horizontal">
           {(provided) => (
             <div
               className="flex"
+              style={{ marginTop: 45 }}
               {...provided.droppableProps}
               ref={provided.innerRef}
             >
@@ -204,7 +229,8 @@ const BoardPage: FC<any> = () => {
           )}
         </Droppable>
       </DragDropContext>
-    </div>
+      <InviteModal boardId={board.id} />
+    </Container>
   );
 };
 

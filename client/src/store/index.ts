@@ -3,16 +3,18 @@ import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import authReducer from './features/auth/authSlice';
 import projectReducer from './features/project/projectSlice';
+import boardReducer from './features/board/boardSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
   project: projectReducer,
+  board: boardReducer,
 });
 
 const persistConfig = {
   key: 'root',
   storage,
-  blacklist: ['project'],
+  blacklist: ['project', 'board'],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

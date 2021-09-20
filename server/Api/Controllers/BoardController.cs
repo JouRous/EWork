@@ -38,6 +38,7 @@ namespace Api.Controllers
         .Include(b => b.Lists)
         .ProjectTo<BoardGetResult>(_mapper.ConfigurationProvider)
         .FirstOrDefaultAsync();
+
       board.Lists = board.Lists.OrderBy(l => l.Pos).ToList();
       return Ok(board);
     }
@@ -50,6 +51,7 @@ namespace Api.Controllers
         .ThenInclude(l => l.Board)
         .Where(x => x.List.BoardId == id)
         .ProjectTo<TicketGetResult>(_mapper.ConfigurationProvider)
+        .AsSplitQuery()
         .ToListAsync();
 
       return Ok(tickets);
@@ -61,7 +63,7 @@ namespace Api.Controllers
       var lists = await _listRepository.Query(x => x.BoardId == id)
         .Include(l => l.Tickets.OrderBy(t => t.Pos))
         .OrderBy(l => l.Pos)
-        .ProjectTo<ListGetResult>(_mapper.ConfigurationProvider)
+        .ProjectTo<ListGetResultWithTicket>(_mapper.ConfigurationProvider)
         .ToListAsync();
 
       foreach (var list in lists)
@@ -99,6 +101,25 @@ namespace Api.Controllers
         StatusCode = 200,
         Message = "Success"
       });
+    }
+
+    [HttpPost("{id}/invite")]
+    public async Task<ActionResult> Invite(Guid id, BoardInviteParams parmams)
+    {
+      var board = await _boardRepository.FirstOrDefaultAsync(id);
+
+      foreach (var userId in parmams.UserIds)
+      {
+        board.UserBoards.Add(new UserBoard
+        {
+          BoardId = id,
+          UserId = userId
+        });
+      }
+
+      await _boardRepository.SaveChangesAsync();
+
+      return Ok();
     }
 
     [HttpDelete("{id}")]

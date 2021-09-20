@@ -12,10 +12,15 @@ namespace Application.Mapper
       CreateMap<Board, CreateBoardParams>().ReverseMap();
 
       CreateMap<Board, BoardGetResult>()
-        .AfterMap((_, boardResult) =>
+        .ForMember(dest => dest.Members, opt =>
         {
-          boardResult.Lists.OrderBy(l => l.Pos);
+          opt.MapFrom(src => src.UserBoards.Select(x => x.User));
         });
+      // .ForMember(dest => dest.Members, opt => 
+      // {
+      //   opt.MapFrom(src => src.)
+      // })
+
     }
   }
 }

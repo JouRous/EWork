@@ -11,7 +11,7 @@ const Container = styled.div`
   display: inline-block;
   margin: 0 4px;
   padding: 4px;
-  height: calc(100vh - 100px);
+  height: calc(100vh - 120px);
   vertical-align: top;
   white-space: nowrap;
   width: 272px;
@@ -38,6 +38,22 @@ const ListTitle = styled.div`
   font-weight: 600;
   padding: 6px 8px;
   transition: color 85ms ease-in;
+`;
+
+const ListTickets = styled.div`
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #bfc4ce;
+    border-radius: 25px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: #dadbe2;
+    border-radius: 25px;
+  }
 `;
 
 const AddCardButton = styled.button`
@@ -99,20 +115,21 @@ export const Column: FC<IProps> = ({ list, index, addTicket }) => {
           {...provided.dragHandleProps}
           className="flex flex-shrink-0"
         >
-          <ColumnContent className="p-3">
+          <ColumnContent className="p-3 pt-1">
             <ListTitle>{list.name}</ListTitle>
             <Droppable droppableId={list.id}>
               {(provided) => (
-                <div
+                <ListTickets
                   style={{ minHeight: 8 }}
                   ref={provided.innerRef}
                   {...provided.droppableProps}
+                  className="pr-2 overflow-x-hidden overflow-y-auto"
                 >
                   {list.tickets.map((ticket, index) => (
                     <Ticket key={ticket.id} ticket={ticket} index={index} />
                   ))}
                   {provided.placeholder}
-                </div>
+                </ListTickets>
               )}
             </Droppable>
 

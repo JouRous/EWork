@@ -12,6 +12,7 @@ namespace Application.Mapper
       CreateMap<User, RegisterParams>().ReverseMap();
 
       CreateMap<User, UserGetResult>().ReverseMap();
+      CreateMap<User, UserDetailDto>().ReverseMap();
     }
   }
 }

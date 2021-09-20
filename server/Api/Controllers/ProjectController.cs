@@ -19,14 +19,17 @@ namespace Api.Controllers
   public class ProjectController : BaseController
   {
     private readonly IRepository<Project> _projectRepository;
+    private readonly IRepository<Board> _boardRepository;
     private readonly ICloudinaryService _cloudinaryService;
     private readonly IMapper _mapper;
     public ProjectController(
         IRepository<Project> projectRepository,
+        IRepository<Board> boardRepository,
         ICloudinaryService cloudinaryService,
         IMapper mapper)
     {
       _projectRepository = projectRepository;
+      _boardRepository = boardRepository;
       _cloudinaryService = cloudinaryService;
       _mapper = mapper;
     }
@@ -40,7 +43,6 @@ namespace Api.Controllers
     public async Task<ActionResult> GetAll()
     {
       var user = GetUserFromContext();
-
 
       var projects = await _projectRepository
         .Query(p => p.Creator == user.Id)
@@ -56,8 +58,9 @@ namespace Api.Controllers
       var user = GetUserFromContext();
 
       var projects = await _projectRepository.Query()
+        .Include(p => p.Boards)
+        .ThenInclude(b => b.UserBoards.Where(x => x.UserId == user.Id))
         .Where(p => p.Creator != user.Id)
-        .Where(p => p.UserProjects.Any(x => x.UserId == user.Id))
         .ToListAsync();
 
       return Ok(projects);
@@ -73,10 +76,12 @@ namespace Api.Controllers
     [HttpGet("{id}/boards")]
     public async Task<ActionResult> GetBoardByProjectId(Guid id)
     {
-      var boards = await _projectRepository.Query(p => p.Id == id)
-        .Include(p => p.Boards)
-        .Select(p => p.Boards)
-        .FirstOrDefaultAsync();
+      var user = GetUserFromContext();
+
+      var boards = await _boardRepository.Query(b => b.ProjectId == id)
+        .Include(b => b.UserBoards)
+        .Where(b => b.UserBoards.Any(x => x.UserId == user.Id))
+        .ToListAsync();
 
       return Ok(boards);
     }

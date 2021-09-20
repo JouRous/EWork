@@ -8,6 +8,7 @@ namespace Abstractions.Entities
   public class Project : BaseEntity
   {
     public string Name { get; set; }
+    public string ShortDescription { get; set; }
     public Guid Creator { get; set; }
     public ICollection<Board> Boards { get; set; } = new List<Board>();
     public ICollection<UserProject> UserProjects { get; set; } = new List<UserProject>();

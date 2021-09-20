@@ -12,5 +12,6 @@ namespace Abstractions.Entities
     public Guid ProjectId { get; set; }
     public Project Project { get; set; }
     public IList<List> Lists { get; set; }
+    public IList<UserBoard> UserBoards { get; set; } = new List<UserBoard>();
   }
 }

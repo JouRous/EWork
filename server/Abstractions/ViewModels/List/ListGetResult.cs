@@ -9,6 +9,5 @@ namespace Abstractions.ViewModels
     public string Name { get; set; }
     public string Pos { get; set; }
     public Guid BoardId { get; set; }
-    public IList<TicketGetResult> Tickets { get; set; }
   }
 }
