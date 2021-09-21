@@ -150,7 +150,7 @@ const BoardPage: FC<any> = () => {
         .post<{ pos: number }>(`/api/v1/listitem/${draggableId}/pos`, {
           pos: movedItem.pos,
         })
-        .subscribe((data) => data);
+        .subscribe((data) => connection.invoke('MoveTicket', board.id));
       setBoard(newBoard);
       return;
     }
@@ -210,7 +210,9 @@ const BoardPage: FC<any> = () => {
             pos: movedTicket.pos,
             listId: destination.droppableId,
           })
-          .subscribe((_) => {});
+          .subscribe((_) => {
+            connection.invoke('MoveTicket', board.id);
+          });
 
         destList.tickets = newDest;
         sourceList.tickets = newSource;
