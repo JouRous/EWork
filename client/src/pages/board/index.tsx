@@ -1,3 +1,4 @@
+import { HubConnectionBuilder } from '@microsoft/signalr';
 import { BoardHeader } from 'components/BoardHeader';
 import { Column } from 'components/Column';
 import { CreateBoardColumn } from 'components/CreateListColumn';
@@ -5,7 +6,7 @@ import { InviteModal } from 'components/InviteModal';
 import { IBoard } from 'models/IBoard';
 import { IList } from 'models/IList';
 import { ITicket } from 'models/ITicket';
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import { useRouteMatch } from 'react-router';
 import { forkJoin, map, mergeAll, toArray } from 'rxjs';
@@ -43,10 +44,33 @@ const BoardPage: FC<any> = () => {
   const [board, setBoard] = useState(boardInit);
   const [loading, setLoading] = useState(true);
   const match = useRouteMatch<{ id: string }>();
+  const connection = useMemo(
+    () =>
+      new HubConnectionBuilder()
+        .withUrl('http://localhost:5000/moveActionHub')
+        .withAutomaticReconnect()
+        .build(),
+    []
+  );
 
   useEffect(() => {
+    const boardId = match.params.id;
+
+    connection.start().then(() => {
+      connection
+        .invoke('InitConnection', boardId)
+        .catch((err) => console.log(err));
+      connection.on('InitConnection', (message) => console.log(message));
+      connection.on('TicketHasMoved', (payload) => {
+        console.log(payload);
+        setBoard(payload);
+      });
+    });
+  }, [match, connection]);
+
+  useEffect(() => {
+    const boardId = match.params.id;
     function fetchBoard() {
-      const boardId = match.params.id;
       const fetchBoardRequest = http.get<IBoard>(`/api/v1/board/${boardId}`);
       const fetchTicketsRequest = http
         .get<IList[]>(`/api/v1/board/${boardId}/lists`)
@@ -68,7 +92,6 @@ const BoardPage: FC<any> = () => {
           board.lists = lists;
 
           setBoard(board);
-          setLoading(false);
         }
       );
     }
@@ -78,7 +101,7 @@ const BoardPage: FC<any> = () => {
 
   const addTicket = (ticket: any) => {
     http.post(`/api/v1/ticket`, ticket).subscribe((data) => {
-      setLoading(true);
+      setLoading(!loading);
     });
   };
 
@@ -92,7 +115,7 @@ const BoardPage: FC<any> = () => {
         pos: getPos(prevPos, ''),
       })
       .subscribe((data) => {
-        setLoading(true);
+        setLoading(!loading);
       });
   };
 
@@ -155,8 +178,11 @@ const BoardPage: FC<any> = () => {
       http
         .post(`/api/v1/ticket/${draggableId}/move`, {
           pos: movedTicket.pos,
+          boardId: board.id,
         })
-        .subscribe((_) => {});
+        .subscribe((_) => {
+          connection.invoke('MoveTicket', board.id);
+        });
       setBoard(newBoard);
     } else {
       const newBoard = {
@@ -229,7 +255,7 @@ const BoardPage: FC<any> = () => {
           )}
         </Droppable>
       </DragDropContext>
-      <InviteModal boardId={board.id} />
+      <InviteModal boardId={board.id} members={board.members} />
     </Container>
   );
 };

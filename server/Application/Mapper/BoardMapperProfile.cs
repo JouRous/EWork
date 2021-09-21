@@ -16,6 +16,12 @@ namespace Application.Mapper
         {
           opt.MapFrom(src => src.UserBoards.Select(x => x.User));
         });
+
+      CreateMap<Board, BoardDetailDto>()
+        .ForMember(dest => dest.Members, opt =>
+        {
+          opt.MapFrom(src => src.UserBoards.Select(x => x.User));
+        });
       // .ForMember(dest => dest.Members, opt => 
       // {
       //   opt.MapFrom(src => src.)

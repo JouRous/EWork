@@ -66,9 +66,10 @@ const Button = styled.button`
 
 interface IProps {
   boardId: string;
+  members: IUser[];
 }
 
-export const InviteModal: FC<IProps> = ({ boardId }) => {
+export const InviteModal: FC<IProps> = ({ boardId, members }) => {
   const [usersFound, setUsersFound] = useState<IUser[]>([]);
   const [invitedUser, setInvitedUser] = useState<IUser[]>([]);
   const [isSearch, setIsSearch] = useState<boolean>(false);
@@ -112,6 +113,10 @@ export const InviteModal: FC<IProps> = ({ boardId }) => {
     });
   };
 
+  const closeSearchPopup = () => {
+    setIsSearch(false);
+  };
+
   return isOpen ? (
     <div
       style={{ zIndex: 999 }}
@@ -121,11 +126,10 @@ export const InviteModal: FC<IProps> = ({ boardId }) => {
         className="bg-white px-3 pt-1 pb-3 relative"
         style={{ zIndex: 100, width: 304 }}
       >
-        <ModalHeader>Invite to board</ModalHeader>
+        <ModalHeader onClick={closeSearchPopup}>Invite to board</ModalHeader>
         <div className="mt-3 relative" style={{ maxWidth: 512 }}>
           <Input
             onChange={(e) => handleOnChange(e)}
-            onBlur={() => setIsSearch(false)}
             type="email"
             placeholder="Email address"
           />
@@ -140,11 +144,23 @@ export const InviteModal: FC<IProps> = ({ boardId }) => {
               className="bg-white absolute left-0 overflow-y-auto w-full py-2 px-3"
             >
               {usersFound.length > 0 ? (
-                usersFound.map((user) => (
-                  <div key={user.id} onMouseDown={() => addInvitedUser(user)}>
-                    <UserSearch user={user} />
-                  </div>
-                ))
+                usersFound.map((user) => {
+                  const isAdded =
+                    members.filter((x) => x.id === user.id).length > 0;
+                  return (
+                    <button
+                      className="w-full"
+                      disabled={isAdded}
+                      onClick={() => addInvitedUser(user)}
+                      style={{
+                        cursor: `${isAdded ? 'not-allowed' : 'pointer'}`,
+                      }}
+                      key={user.id}
+                    >
+                      <UserSearch user={user} />
+                    </button>
+                  );
+                })
               ) : (
                 <div>Not found</div>
               )}
@@ -152,6 +168,7 @@ export const InviteModal: FC<IProps> = ({ boardId }) => {
           )}
         </div>
         <div
+          onClick={closeSearchPopup}
           style={{ minHeight: 50, maxHeight: 280 }}
           className="overflow-y-auto"
         >
@@ -174,7 +191,7 @@ export const InviteModal: FC<IProps> = ({ boardId }) => {
           X
         </button>
       </div>
-      <Overlay />
+      <Overlay onClick={closeSearchPopup} />
     </div>
   ) : null;
 };

@@ -2,9 +2,11 @@ using System;
 using System.Threading.Tasks;
 using Abstractions.Entities;
 using Abstractions.ViewModels;
+using Api.Hubs;
 using AutoMapper;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Api.Controllers
 {
@@ -12,16 +14,19 @@ namespace Api.Controllers
   {
     private readonly IRepository<Ticket> _ticketRepository;
     private readonly IRepository<List> _listRepository;
+    private readonly IHubContext<MoveActionHub> _moveActionHub;
     private readonly IMapper _mapper;
 
     public TicketController(
         IRepository<Ticket> ticketRepository,
         IRepository<List> listRepository,
+        IHubContext<MoveActionHub> moveActionHub,
         IMapper mapper
     )
     {
       _ticketRepository = ticketRepository;
       _listRepository = listRepository;
+      _moveActionHub = moveActionHub;
       _mapper = mapper;
     }
 

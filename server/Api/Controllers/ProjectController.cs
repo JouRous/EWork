@@ -78,12 +78,17 @@ namespace Api.Controllers
     {
       var user = GetUserFromContext();
 
-      var boards = await _boardRepository.Query(b => b.ProjectId == id)
-        .Include(b => b.UserBoards)
-        .Where(b => b.UserBoards.Any(x => x.UserId == user.Id))
-        .ToListAsync();
+      var project = await _projectRepository.Query(p => p.Id == id)
+        .Include(b => b.Boards)
+        .ThenInclude(b => b.UserBoards)
+        .FirstOrDefaultAsync();
 
-      return Ok(boards);
+      if (!(project.Creator == user.Id))
+      {
+        project.Boards = project.Boards.Where(b => b.UserBoards.Any(x => x.UserId == user.Id)).ToList();
+      }
+
+      return Ok(_mapper.Map<IList<BoardGetResult>>(project.Boards));
     }
 
     [HttpPost]

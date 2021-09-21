@@ -1,4 +1,5 @@
 using Api.Extensions;
+using Api.Hubs;
 using Api.Middleware;
 using Application;
 using Infrastructure;
@@ -44,6 +45,7 @@ namespace Api
       // services.AddApiVersioning();
 
       services.AddApiServices(Configuration);
+      services.AddSignalR();
 
       services.AddApplicationServices(Configuration);
       services.AddInfrastructureServices(Configuration);
@@ -109,6 +111,7 @@ namespace Api
       app.UseEndpoints(endpoints =>
       {
         endpoints.MapControllers();
+        endpoints.MapHub<MoveActionHub>("/moveActionHub");
       });
     }
   }

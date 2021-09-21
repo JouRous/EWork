@@ -35,11 +35,18 @@ namespace Api.Controllers
     public async Task<ActionResult> GetById(Guid id)
     {
       var board = await _boardRepository.Query(board => board.Id == id)
-        .Include(b => b.Lists)
-        .ProjectTo<BoardGetResult>(_mapper.ConfigurationProvider)
+        .Include(b => b.Lists.OrderBy(x => x.Pos))
+        .ThenInclude(l => l.Tickets.OrderBy(x => x.Pos))
+        .ProjectTo<BoardDetailDto>(_mapper.ConfigurationProvider)
         .FirstOrDefaultAsync();
 
       board.Lists = board.Lists.OrderBy(l => l.Pos).ToList();
+
+      board.Lists = board.Lists.OrderBy(l => l.Pos).ToList();
+      foreach (var list in board.Lists)
+      {
+        list.Tickets = list.Tickets.OrderBy(x => x.Pos).ToList();
+      }
       return Ok(board);
     }
 
