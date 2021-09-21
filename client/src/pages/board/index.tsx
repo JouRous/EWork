@@ -103,6 +103,7 @@ const BoardPage: FC<any> = () => {
   const addTicket = (ticket: any) => {
     http.post(`/api/v1/ticket`, ticket).subscribe((data) => {
       setLoading(!loading);
+      connection.invoke('MoveTicket', board.id);
     });
   };
 
@@ -117,6 +118,7 @@ const BoardPage: FC<any> = () => {
       })
       .subscribe((data) => {
         setLoading(!loading);
+        connection.invoke('MoveTicket', board.id);
       });
   };
 
