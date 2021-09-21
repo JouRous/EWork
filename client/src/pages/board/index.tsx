@@ -10,6 +10,7 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import { useRouteMatch } from 'react-router';
 import { forkJoin, map, mergeAll, toArray } from 'rxjs';
+import { BASE_URL } from 'services/axios-instance';
 import http from 'services/http-service';
 import styled from 'styled-components';
 import { getPos } from 'utils';
@@ -47,7 +48,7 @@ const BoardPage: FC<any> = () => {
   const connection = useMemo(
     () =>
       new HubConnectionBuilder()
-        .withUrl('http://localhost:5000/moveActionHub')
+        .withUrl(`${BASE_URL}/moveActionHub`)
         .withAutomaticReconnect()
         .build(),
     []
