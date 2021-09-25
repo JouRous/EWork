@@ -4,17 +4,19 @@ import storage from 'redux-persist/lib/storage';
 import authReducer from './features/auth/authSlice';
 import projectReducer from './features/project/projectSlice';
 import boardReducer from './features/board/boardSlice';
+import ticketReducer from './features/ticket/ticketSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
   project: projectReducer,
   board: boardReducer,
+  ticket: ticketReducer,
 });
 
 const persistConfig = {
   key: 'root',
   storage,
-  blacklist: ['project', 'board'],
+  blacklist: ['project', 'board', 'ticket'],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

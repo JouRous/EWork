@@ -3,7 +3,7 @@ import { IUser } from './user';
 
 export interface IBoard {
   id: string;
-  name: string;
+  title: string;
   lists: IList[];
   members: IUser[];
 }

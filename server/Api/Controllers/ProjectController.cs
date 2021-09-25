@@ -57,13 +57,21 @@ namespace Api.Controllers
     {
       var user = GetUserFromContext();
 
-      var projects = await _projectRepository.Query()
-        .Include(p => p.Boards)
-        .ThenInclude(b => b.UserBoards.Where(x => x.UserId == user.Id))
-        .Where(p => p.Creator != user.Id)
+      // Try to find the nest query in linq
+      var projectIds = await _boardRepository.Query()
+        .Where(b => b.UserBoards.Any(x => x.UserId == user.Id))
+        .Include(b => b.Project)
+        .Where(b => b.Project.Creator != user.Id)
+        .Select(x => x.ProjectId)
         .ToListAsync();
 
-      return Ok(projects);
+      var projects = await _projectRepository.Query()
+        .Where(p => p.Creator != user.Id)
+        .Where(p => projectIds.Any(x => x == p.Id))
+        .Include(p => p.Boards.Where(b => b.UserBoards.Any(x => x.UserId == user.Id)))
+        .ToListAsync();
+
+      return Ok(_mapper.Map<IList<ProjectGetResult>>(projects));
     }
 
     [HttpGet("{id}")]

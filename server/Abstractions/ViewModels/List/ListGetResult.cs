@@ -6,7 +6,7 @@ namespace Abstractions.ViewModels
 {
   public class ListGetResult : BaseGetResult
   {
-    public string Name { get; set; }
+    public string Title { get; set; }
     public string Pos { get; set; }
     public Guid BoardId { get; set; }
   }

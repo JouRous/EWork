@@ -15,17 +15,17 @@ export const projectSlice = createSlice({
   initialState,
   reducers: {
     fetchProjectRequest: (state) => {
-      state.isLoadProject = true;
+      state.isLoadProject = !state.isLoadProject;
     },
     fetchProjectSuccess: (state) => {
-      state.isLoadProject = false;
+      state.isLoadProject = !state.isLoadProject;
     },
     openModal: (state) => {
       state.isModalOpen = true;
     },
     closeModal: (state) => {
       state.isModalOpen = false;
-      state.isLoadProject = true;
+      state.isLoadProject = !state.isLoadProject;
     },
     dismissModal: (state) => {
       state.isModalOpen = false;

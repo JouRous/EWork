@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Abstractions.Entities;
@@ -34,9 +33,13 @@ namespace Api.Controllers
     [HttpGet("{id}")]
     public async Task<ActionResult> GetById(Guid id)
     {
+      var user = (User)HttpContext.Items["User"];
+
       var board = await _boardRepository.Query(board => board.Id == id)
         .Include(b => b.Lists.OrderBy(x => x.Pos))
         .ThenInclude(l => l.Tickets.OrderBy(x => x.Pos))
+        .Include(b => b.UserBoards)
+        .Where(b => b.UserBoards.Any(u => u.UserId == user.Id))
         .ProjectTo<BoardDetailDto>(_mapper.ConfigurationProvider)
         .FirstOrDefaultAsync();
 
@@ -99,7 +102,7 @@ namespace Api.Controllers
     public async Task<ActionResult> Update(Guid id, UpdateBoardParams updateBoardParams)
     {
       var boardToUpdate = await _boardRepository.FirstOrDefaultAsync(id);
-      boardToUpdate.Name = updateBoardParams.Name;
+      boardToUpdate.Title = updateBoardParams.Title;
 
       await _boardRepository.SaveChangesAsync();
 

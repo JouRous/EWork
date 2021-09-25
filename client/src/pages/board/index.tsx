@@ -3,6 +3,7 @@ import { BoardHeader } from 'components/BoardHeader';
 import { Column } from 'components/Column';
 import { CreateBoardColumn } from 'components/CreateListColumn';
 import { InviteModal } from 'components/InviteModal';
+import { TicketDetail } from 'components/TicketDetail';
 import { IBoard } from 'models/IBoard';
 import { IList } from 'models/IList';
 import { ITicket } from 'models/ITicket';
@@ -38,7 +39,7 @@ const BoardPage: FC<any> = () => {
     'https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2239x1600/9cd9d9e923c9fa0cb96ac27418fad55c/photo-1630980260348-16f484cb6471.jpg';
   const boardInit = {
     id: '',
-    name: '',
+    title: '',
     lists: [],
     members: [],
   } as IBoard;
@@ -112,7 +113,7 @@ const BoardPage: FC<any> = () => {
     const prevPos = lastList ? lastList.pos : '';
     http
       .post(`/api/v1/listitem`, {
-        name: list.name,
+        title: list.title,
         boardId: board.id,
         pos: getPos(prevPos, ''),
       })
@@ -236,7 +237,7 @@ const BoardPage: FC<any> = () => {
       <div
         style={{ backgroundColor: 'transparent', height: 45, width: '100%' }}
       ></div>
-      <BoardHeader boardName={board.name} members={board.members} />
+      <BoardHeader boardName={board.title} members={board.members} />
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="all-lists" type="list" direction="horizontal">
           {(provided) => (
@@ -261,6 +262,7 @@ const BoardPage: FC<any> = () => {
         </Droppable>
       </DragDropContext>
       <InviteModal boardId={board.id} members={board.members} />
+      <TicketDetail />
     </Container>
   );
 };

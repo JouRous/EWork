@@ -116,7 +116,7 @@ export const Column: FC<IProps> = ({ list, index, addTicket }) => {
           className="flex flex-shrink-0"
         >
           <ColumnContent className="p-3 pt-1">
-            <ListTitle>{list.name}</ListTitle>
+            <ListTitle>{list.title}</ListTitle>
             <Droppable droppableId={list.id}>
               {(provided) => (
                 <ListTickets
@@ -137,7 +137,7 @@ export const Column: FC<IProps> = ({ list, index, addTicket }) => {
               <div>
                 <AddCardForm className="px-2 pt-1">
                   <Input
-                    {...register('name')}
+                    {...register('title')}
                     placeholder="Enter card title..."
                   />
                 </AddCardForm>
@@ -151,18 +151,18 @@ export const Column: FC<IProps> = ({ list, index, addTicket }) => {
                         boxShadow: 'none',
                         color: '#fff',
                       }}
-                      onClick={handleSubmit((data: { name: string }) => {
+                      onClick={handleSubmit((data: { title: string }) => {
                         const bottomTicket =
                           list.tickets[list.tickets.length - 1];
                         const prevPos = bottomTicket ? bottomTicket.pos : '';
 
                         addTicket({
-                          name: data.name,
+                          title: data.title,
                           listId: list.id,
                           pos: getPos(prevPos, ''),
                         });
                         setIsToggle(false);
-                        reset({ name: '' });
+                        reset({ title: '' });
                       })}
                     >
                       Add card

@@ -5,7 +5,6 @@ import http from 'services/http-service';
 import { ListWorkspace } from 'components/ListWorkspace';
 import { Sidebar } from 'components/Sidebar';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { fetchProjectSuccess } from 'store/features/project/projectSlice';
 import { CreateProjectModal } from 'components/CreateProjectModal';
 import { IProject } from 'models/IProject';
 
@@ -31,7 +30,6 @@ const HomePage: FC<IProps> = () => {
       forkJoin([project$, guestProjects$]).subscribe((data) => {
         setProjects(data[0]);
         setGuestProjects(data[1]);
-        dispatch(fetchProjectSuccess());
       });
     }
 

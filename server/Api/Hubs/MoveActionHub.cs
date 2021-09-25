@@ -31,7 +31,6 @@ namespace Api.Hubs
 
     public async Task MoveTicket(string boardId)
     {
-      Console.WriteLine("Move Ticket");
       var board = await _boardRepository.Query(board => board.Id == new Guid(boardId))
         .Include(b => b.Lists)
         .ThenInclude(l => l.Tickets)

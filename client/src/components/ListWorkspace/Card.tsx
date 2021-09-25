@@ -19,7 +19,7 @@ export const Card: FC<IProps> = ({ board }) => {
           style={{ height: 80 }}
           className="flex flex-col justify-between relative"
         >
-          <div className="font-bold text-white">{board.name}</div>
+          <div className="font-bold text-white">{board.title}</div>
           <div></div>
         </div>
       </BoardCardWrapper>

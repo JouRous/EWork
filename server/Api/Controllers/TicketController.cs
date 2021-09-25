@@ -7,6 +7,7 @@ using AutoMapper;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.Controllers
 {
@@ -30,7 +31,13 @@ namespace Api.Controllers
       _mapper = mapper;
     }
 
-    [HttpGet("id")]
+    [HttpGet]
+    public async Task<ActionResult> GetAll()
+    {
+      return Ok(await _ticketRepository.Query().ToListAsync());
+    }
+
+    [HttpGet("{id}")]
     public async Task<ActionResult> Get(Guid id)
     {
       var ticket = await _ticketRepository.FirstOrDefaultAsync(id);

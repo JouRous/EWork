@@ -40,9 +40,11 @@ export const ListWorkspace: FC<IProps> = ({ projects, guestProjects }) => {
             <ListBoard project={project} />
           </div>
         ))}
-        <SectionTitle className="uppercase">Guest Workspaces</SectionTitle>
+        {guestProjects.length > 0 ? (
+          <SectionTitle className="uppercase">Guest Workspaces</SectionTitle>
+        ) : null}
         {guestProjects.map((project) => (
-          <div>
+          <div key={project.id}>
             <WorkspaceItem project={project} />
             <ListBoard project={project} />
           </div>

@@ -3,6 +3,6 @@ import { ITicket } from './ITicket';
 
 export interface IList extends IMoveable {
   id: string;
-  name: string;
+  title: string;
   tickets: ITicket[];
 }

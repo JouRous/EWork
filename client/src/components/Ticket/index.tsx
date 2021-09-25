@@ -1,5 +1,7 @@
 import { FC } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
+import { openCard } from 'store/features/ticket/ticketSlice';
+import { useAppDispatch } from 'store/hooks';
 import styled from 'styled-components';
 import { ITicket } from '../../models/ITicket';
 
@@ -23,6 +25,8 @@ interface IProps {
 }
 
 export const Ticket: FC<IProps> = ({ ticket, index }) => {
+  const dispatch = useAppDispatch();
+
   return (
     <Draggable draggableId={ticket.id} index={index}>
       {(provided) => (
@@ -31,8 +35,9 @@ export const Ticket: FC<IProps> = ({ ticket, index }) => {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           className="select-none rounded px-2 py-1"
+          onClick={() => dispatch(openCard('123123'))}
         >
-          {ticket.name}
+          {ticket.title}
         </Wrapper>
       )}
     </Draggable>

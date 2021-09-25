@@ -2,6 +2,6 @@ namespace Abstractions.ViewModels
 {
   public class UpdateBoardParams
   {
-    public string Name { get; set; }
+    public string Title { get; set; }
   }
 }
