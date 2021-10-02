@@ -35,7 +35,7 @@ export const Ticket: FC<IProps> = ({ ticket, index }) => {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           className="select-none rounded px-2 py-1"
-          onClick={() => dispatch(openCard('123123'))}
+          onClick={() => dispatch(openCard(ticket.id))}
         >
           {ticket.title}
         </Wrapper>

@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Abstractions.Entities;
 using Abstractions.ViewModels;
@@ -27,6 +28,7 @@ namespace Api.Controllers
       return Ok(await _commentRepository.Query().ToListAsync());
     }
 
+    /// <summary>Create comment</summary>
     [HttpPost]
     public async Task<ActionResult> Create(CreateCommentParams createCommentParams)
     {
@@ -36,6 +38,18 @@ namespace Api.Controllers
       await _commentRepository.SaveChangesAsync();
 
       return Ok();
+    }
+
+    /// <summary>Update comment</summary>
+    [HttpPut("{id}")]
+    public async Task<ActionResult> Update(Guid id, UpdateCommentParams body)
+    {
+      var comment = await _commentRepository.FirstOrDefaultAsync(id);
+      comment.Content = body.Content;
+      comment.CreatedAt = DateTime.Now;
+      await _commentRepository.SaveChangesAsync();
+
+      return Ok(comment);
     }
 
   }

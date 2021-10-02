@@ -179,9 +179,8 @@ const BoardPage: FC<any> = () => {
       list.tickets = newListTicket;
 
       http
-        .post(`/api/v1/ticket/${draggableId}/move`, {
+        .post(`/api/v1/ticket/${draggableId}/pos`, {
           pos: movedTicket.pos,
-          boardId: board.id,
         })
         .subscribe((_) => {
           connection.invoke('MoveTicket', board.id);
@@ -208,7 +207,7 @@ const BoardPage: FC<any> = () => {
         );
 
         http
-          .post(`/api/v1/ticket/${draggableId}/move`, {
+          .post(`/api/v1/ticket/${draggableId}/pos`, {
             pos: movedTicket.pos,
             listId: destination.droppableId,
           })
@@ -230,6 +229,16 @@ const BoardPage: FC<any> = () => {
     }
     return background;
   }
+
+  const closeTicketPopup = (ticket: ITicket) => {
+    const newBoard = { ...board };
+    const listInx = newBoard.lists.findIndex((x) => x.id === ticket.listId);
+    const ticketIndex = newBoard.lists[listInx].tickets.findIndex(
+      (x) => x.id === ticket.id
+    );
+    newBoard.lists[listInx].tickets[ticketIndex] = ticket;
+    setBoard(newBoard);
+  };
 
   return (
     <Container
@@ -268,7 +277,7 @@ const BoardPage: FC<any> = () => {
         </Droppable>
       </DragDropContext>
       <InviteModal boardId={board.id} members={board.members} />
-      <TicketDetail />
+      <TicketDetail closeTicketPopup={closeTicketPopup} />
     </Container>
   );
 };

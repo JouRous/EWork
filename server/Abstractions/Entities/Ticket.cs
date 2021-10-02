@@ -1,6 +1,5 @@
 using System;
-using System.Text.Json.Serialization;
-using Infrastructure.Helpers;
+using System.Collections.Generic;
 using Infrastructure.Models;
 
 namespace Abstractions.Entities
@@ -13,5 +12,6 @@ namespace Abstractions.Entities
     public string Pos { get; set; }
     public Guid ListId { get; set; }
     public List List { get; set; }
+    public ICollection<Comment> Comments { get; set; }
   }
 }

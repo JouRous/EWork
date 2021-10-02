@@ -19,8 +19,13 @@ export const ticketSlice = createSlice({
       ticketId: action.payload,
       isOpen: true,
     }),
+    closeCard: (state) => ({
+      ...state,
+      ticketId: '',
+      isOpen: false,
+    }),
   },
 });
 
-export const { openCard } = ticketSlice.actions;
+export const { openCard, closeCard } = ticketSlice.actions;
 export default ticketSlice.reducer;

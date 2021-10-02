@@ -13,9 +13,15 @@ const post = <T>(path: string, data: any, options?: AxiosRequestConfig) => {
   return from(request);
 };
 
+const path = <T>(path: string, data: any, options?: AxiosRequestConfig) => {
+  const request = axiosInstance.patch<T>(path, data, { ...options });
+  return from(request);
+};
+
 const http = {
   get,
   post,
+  path,
 };
 
 export default http;

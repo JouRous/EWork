@@ -4,6 +4,7 @@ using Abstractions.Entities;
 using Abstractions.ViewModels;
 using Api.Hubs;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -42,7 +43,10 @@ namespace Api.Controllers
     [HttpGet("{id}")]
     public async Task<ActionResult> Get(Guid id)
     {
-      var ticket = await _ticketRepository.FirstOrDefaultAsync(id);
+      var ticket = await _ticketRepository.Query(t => t.Id == id)
+        .Include(t => t.Comments)
+        .ProjectTo<TicketGetResult>(_mapper.ConfigurationProvider)
+        .FirstOrDefaultAsync();
       return Ok(ticket);
     }
 
@@ -81,6 +85,28 @@ namespace Api.Controllers
         StatusCode = 200,
         Message = "Success"
       });
+    }
+
+    /// <summary>Update title of ticket</summary>
+    [HttpPatch("{id}/title")]
+    public async Task<ActionResult> UpdateTitle(Guid id, UpdateTicketParams body)
+    {
+      var ticket = await _ticketRepository.FirstOrDefaultAsync(id);
+      ticket.Title = body.Title;
+      await _listRepository.SaveChangesAsync();
+
+      return Ok(ticket);
+    }
+
+    /// <summary>Update description of ticket</summary>
+    [HttpPatch("{id}/description")]
+    public async Task<ActionResult> UpdateDescription(Guid id, UpdateTicketParams body)
+    {
+      var ticket = await _ticketRepository.FirstOrDefaultAsync(id);
+      ticket.Description = body.Description;
+      await _listRepository.SaveChangesAsync();
+
+      return Ok(ticket);
     }
   }
 }
