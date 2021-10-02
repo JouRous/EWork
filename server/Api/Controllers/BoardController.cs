@@ -30,6 +30,7 @@ namespace Api.Controllers
       _mapper = mapper;
     }
 
+    ///<summary>Get board by id</summary>
     [HttpGet("{id}")]
     public async Task<ActionResult> GetById(Guid id)
     {
@@ -38,12 +39,11 @@ namespace Api.Controllers
       var board = await _boardRepository.Query(board => board.Id == id)
         .Include(b => b.Lists.OrderBy(x => x.Pos))
         .ThenInclude(l => l.Tickets.OrderBy(x => x.Pos))
-        .Include(b => b.UserBoards)
-        .Where(b => b.UserBoards.Any(u => u.UserId == user.Id))
+        .Include(b => b.Project)
+        .ThenInclude(p => p.UserProjects)
+        .ThenInclude(x => x.User)
         .ProjectTo<BoardDetailDto>(_mapper.ConfigurationProvider)
         .FirstOrDefaultAsync();
-
-      board.Lists = board.Lists.OrderBy(l => l.Pos).ToList();
 
       board.Lists = board.Lists.OrderBy(l => l.Pos).ToList();
       foreach (var list in board.Lists)
@@ -53,6 +53,7 @@ namespace Api.Controllers
       return Ok(board);
     }
 
+    ///<summary>Get tickets in board</summary>
     [HttpGet("{id}/tickets")]
     public async Task<ActionResult> GetTicketsInBoard(Guid id)
     {
@@ -67,6 +68,7 @@ namespace Api.Controllers
       return Ok(tickets);
     }
 
+    ///<summary>Get lists in board</summary>
     [HttpGet("{id}/lists")]
     public async Task<ActionResult> GetListItems(Guid id)
     {
@@ -84,6 +86,7 @@ namespace Api.Controllers
       return Ok(lists);
     }
 
+    ///<summary>Create board</summary>
     [HttpPost]
     public async Task<ActionResult> Create(CreateBoardParams createBoardParams)
     {
@@ -98,6 +101,7 @@ namespace Api.Controllers
       });
     }
 
+    ///<summary>Update board</summary>
     [HttpPut("{id}")]
     public async Task<ActionResult> Update(Guid id, UpdateBoardParams updateBoardParams)
     {
@@ -113,25 +117,7 @@ namespace Api.Controllers
       });
     }
 
-    [HttpPost("{id}/invite")]
-    public async Task<ActionResult> Invite(Guid id, BoardInviteParams parmams)
-    {
-      var board = await _boardRepository.FirstOrDefaultAsync(id);
-
-      foreach (var userId in parmams.UserIds)
-      {
-        board.UserBoards.Add(new UserBoard
-        {
-          BoardId = id,
-          UserId = userId
-        });
-      }
-
-      await _boardRepository.SaveChangesAsync();
-
-      return Ok();
-    }
-
+    ///<summary>Delete board</summary>
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(Guid id)
     {

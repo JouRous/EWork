@@ -8,5 +8,10 @@ namespace Abstractions.Exceptions
 
     public HttpException(string message) : base(message)
     { }
+
+    public HttpException(int statusCode, string message) : base(message)
+    {
+      StatusCode = statusCode;
+    }
   }
 }

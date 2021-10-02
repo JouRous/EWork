@@ -23,6 +23,7 @@ namespace Api.Controllers
       _mapper = mapper;
     }
 
+    ///<summary>Get list</summary>
     [HttpGet]
     public async Task<ActionResult> GetList()
     {
@@ -31,6 +32,7 @@ namespace Api.Controllers
       return Ok(lists);
     }
 
+    ///<summary>Get list by id</summary>
     [HttpGet("{id}")]
     public async Task<ActionResult> GetById(Guid id)
     {
@@ -40,6 +42,7 @@ namespace Api.Controllers
       return Ok(list);
     }
 
+    ///<summary>Get ticket by list id</summary>
     [HttpGet("{id}/tickets")]
     public async Task<ActionResult> GetTickets(Guid id)
     {
@@ -51,6 +54,7 @@ namespace Api.Controllers
       return Ok(tickets);
     }
 
+    ///<summary>Create list</summary>
     [HttpPost]
     public async Task<ActionResult> Create(CreateListParams createListParams)
     {
@@ -66,6 +70,7 @@ namespace Api.Controllers
       });
     }
 
+    ///<summary>Move list (Update pos)</summary>
     [HttpPost("{id}/pos")]
     public async Task<ActionResult> MoveList(Guid id, MoveListParams moveListParams)
     {

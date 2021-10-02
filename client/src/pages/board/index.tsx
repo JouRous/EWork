@@ -35,8 +35,7 @@ const Container = styled.div`
 `;
 
 const BoardPage: FC<any> = () => {
-  const background =
-    'https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2239x1600/9cd9d9e923c9fa0cb96ac27418fad55c/photo-1630980260348-16f484cb6471.jpg';
+  const background = '#ECF1E8';
   const boardInit = {
     id: '',
     title: '',
@@ -225,10 +224,17 @@ const BoardPage: FC<any> = () => {
     }
   };
 
+  function setBackgroundStyle() {
+    if (background.includes('https') || background.includes('http')) {
+      return `url(${background})`;
+    }
+    return background;
+  }
+
   return (
     <Container
       style={{
-        backgroundImage: `url(${background})`,
+        background: `${setBackgroundStyle()}`,
         backgroundPosition: '50%',
         backgroundSize: 'cover',
       }}

@@ -3,15 +3,17 @@ using System;
 using Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211002015635_AddComment")]
+    partial class AddComment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -203,6 +205,21 @@ namespace Api.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Abstractions.Entities.UserBoard", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("BoardId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("UserId", "BoardId");
+
+                    b.HasIndex("BoardId");
+
+                    b.ToTable("UserBoard");
+                });
+
             modelBuilder.Entity("Abstractions.Entities.UserProject", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -270,6 +287,25 @@ namespace Api.Migrations
                     b.Navigation("List");
                 });
 
+            modelBuilder.Entity("Abstractions.Entities.UserBoard", b =>
+                {
+                    b.HasOne("Abstractions.Entities.Board", "Board")
+                        .WithMany("UserBoards")
+                        .HasForeignKey("BoardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Abstractions.Entities.User", "User")
+                        .WithMany("UserBoards")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Board");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Abstractions.Entities.UserProject", b =>
                 {
                     b.HasOne("Abstractions.Entities.Project", "Project")
@@ -292,6 +328,8 @@ namespace Api.Migrations
             modelBuilder.Entity("Abstractions.Entities.Board", b =>
                 {
                     b.Navigation("Lists");
+
+                    b.Navigation("UserBoards");
                 });
 
             modelBuilder.Entity("Abstractions.Entities.List", b =>
@@ -308,6 +346,8 @@ namespace Api.Migrations
 
             modelBuilder.Entity("Abstractions.Entities.User", b =>
                 {
+                    b.Navigation("UserBoards");
+
                     b.Navigation("UserProjects");
                 });
 #pragma warning restore 612, 618

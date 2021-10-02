@@ -31,12 +31,14 @@ namespace Api.Controllers
       _mapper = mapper;
     }
 
+    /// <summary>Get tickets</summary>
     [HttpGet]
     public async Task<ActionResult> GetAll()
     {
       return Ok(await _ticketRepository.Query().ToListAsync());
     }
 
+    /// <summary>Get ticket by id</summary>
     [HttpGet("{id}")]
     public async Task<ActionResult> Get(Guid id)
     {
@@ -44,6 +46,7 @@ namespace Api.Controllers
       return Ok(ticket);
     }
 
+    /// <summary>Create ticket</summary>
     [HttpPost]
     public async Task<ActionResult> Create(CreateTicketParams createTicketParams)
     {
@@ -59,7 +62,8 @@ namespace Api.Controllers
       });
     }
 
-    [HttpPost("{id}/move")]
+    /// <summary>Move ticket (Update pos)</summary>
+    [HttpPost("{id}/pos")]
     public async Task<ActionResult> UpdatePos(Guid id, MoveTicketParams moveTicketParams)
     {
       var ticket = await _ticketRepository.FirstOrDefaultAsync(id);

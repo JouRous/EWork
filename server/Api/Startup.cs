@@ -1,9 +1,11 @@
+using System;
+using System.IO;
+using System.Reflection;
 using Api.Extensions;
 using Api.Hubs;
 using Api.Middleware;
 using Application;
 using Infrastructure;
-using Infrastructure.Models;
 using Infrastructure.Swagger;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -13,7 +15,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Api
@@ -60,6 +61,9 @@ namespace Api
       services.AddSwaggerGen(options =>
       {
         options.OperationFilter<SwaggerDefaultValues>();
+        var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+        options.IncludeXmlComments(xmlPath);
       });
 
       // services.AddSwaggerGen(c =>

@@ -16,7 +16,7 @@ const Container = styled.div`
 
 const Button = styled.div`
   border-radius: 3px;
-  color: #fff;
+  color: #172b4d;
   cursor: default;
   float: left;
   font-size: 14px;
@@ -52,7 +52,7 @@ export const BoardHeader: FC<IProps> = ({ boardName, members }) => {
       <div className="flex">
         <div
           style={{ fontSize: 18, lineHeight: '35px' }}
-          className="font-bold text-white h-full mr-3"
+          className="font-bold text-black h-full mr-3"
         >
           {boardName}
         </div>

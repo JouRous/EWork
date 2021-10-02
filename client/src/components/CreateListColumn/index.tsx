@@ -61,7 +61,7 @@ interface IProps {
 
 export const CreateBoardColumn: FC<IProps> = ({ addList }) => {
   const [isToggle, setToggle] = useState(false);
-  const { register, handleSubmit, reset } = useForm<{ name: string }>();
+  const { register, handleSubmit, reset } = useForm<{ title: string }>();
   return (
     <Wrapper>
       {isToggle ? (
@@ -69,7 +69,7 @@ export const CreateBoardColumn: FC<IProps> = ({ addList }) => {
           <AddForm className="px-2">
             <Input
               className="py-1"
-              {...register('name')}
+              {...register('title')}
               placeholder="Enter list title..."
             />
           </AddForm>
@@ -83,10 +83,10 @@ export const CreateBoardColumn: FC<IProps> = ({ addList }) => {
                   boxShadow: 'none',
                   color: '#fff',
                 }}
-                onClick={handleSubmit((data: { name: string }) => {
+                onClick={handleSubmit((data: { title: string }) => {
                   addList(data);
                   setToggle(false);
-                  reset({ name: '' });
+                  reset({ title: '' });
                 })}
               >
                 Add card

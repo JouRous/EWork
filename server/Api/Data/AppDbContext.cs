@@ -14,7 +14,6 @@ namespace Api.Data
       base.OnModelCreating(modelBuilder);
 
       modelBuilder.Entity<UserProject>().HasKey(src => new { src.UserId, src.ProjectId });
-      modelBuilder.Entity<UserBoard>().HasKey(src => new { src.UserId, src.BoardId });
     }
 
     public DbSet<User> Users { get; set; }
@@ -23,5 +22,6 @@ namespace Api.Data
     public DbSet<Board> Boards { get; set; }
     public DbSet<List> Lists { get; set; }
     public DbSet<Ticket> Tickets { get; set; }
+    public DbSet<Comment> Comments { get; set; }
   }
 }

@@ -8,6 +8,7 @@ using Abstractions.ViewModels;
 using Api.Middleware;
 using Application.Services.Interfaces;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -39,6 +40,7 @@ namespace Api.Controllers
       return (User)HttpContext.Items["User"];
     }
 
+    /// <summary>Get projects</summary>
     [HttpGet, MapToApiVersion("1.0")]
     public async Task<ActionResult> GetAll()
     {
@@ -52,28 +54,24 @@ namespace Api.Controllers
       return Ok(_mapper.Map<IList<ProjectGetResult>>(projects));
     }
 
+
+    /// <summary>Get guest project</summary>
     [HttpGet("guest")]
     public async Task<ActionResult> GetGuestProject()
     {
       var user = GetUserFromContext();
 
-      // Try to find the nest query in linq
-      var projectIds = await _boardRepository.Query()
-        .Where(b => b.UserBoards.Any(x => x.UserId == user.Id))
-        .Include(b => b.Project)
-        .Where(b => b.Project.Creator != user.Id)
-        .Select(x => x.ProjectId)
-        .ToListAsync();
-
       var projects = await _projectRepository.Query()
+        .Include(x => x.UserProjects)
         .Where(p => p.Creator != user.Id)
-        .Where(p => projectIds.Any(x => x == p.Id))
-        .Include(p => p.Boards.Where(b => b.UserBoards.Any(x => x.UserId == user.Id)))
+        .Where(p => p.UserProjects.Any(x => x.UserId == user.Id))
+        .ProjectTo<ProjectGetResult>(_mapper.ConfigurationProvider)
         .ToListAsync();
 
-      return Ok(_mapper.Map<IList<ProjectGetResult>>(projects));
+      return Ok(projects);
     }
 
+    ///<summary>Get project by Id</summary>
     [HttpGet("{id}")]
     public async Task<ActionResult> GetById(Guid id)
     {
@@ -81,24 +79,34 @@ namespace Api.Controllers
       return Ok(project);
     }
 
+    /// <summary>Get boards by project id</summary>
     [HttpGet("{id}/boards")]
     public async Task<ActionResult> GetBoardByProjectId(Guid id)
     {
       var user = GetUserFromContext();
 
-      var project = await _projectRepository.Query(p => p.Id == id)
-        .Include(b => b.Boards)
-        .ThenInclude(b => b.UserBoards)
+      var users = await _projectRepository.Query()
+        .Include(p => p.UserProjects)
+        .Select(p => p.UserProjects)
         .FirstOrDefaultAsync();
 
-      if (!(project.Creator == user.Id))
+      var checkExist = users.Any(x => x.UserId == user.Id);
+
+      if (!checkExist)
       {
-        project.Boards = project.Boards.Where(b => b.UserBoards.Any(x => x.UserId == user.Id)).ToList();
+        throw new HttpException(403, "Access Denied");
       }
 
-      return Ok(_mapper.Map<IList<BoardGetResult>>(project.Boards));
+      var boards = await _projectRepository.Query(p => p.Id == id)
+        .Include(p => p.Boards)
+        .Select(p => p.Boards)
+        .FirstOrDefaultAsync();
+
+      // return Ok(_mapper.Map<IList<BoardGetResult>>(project.Boards));
+      return Ok(boards);
     }
 
+    /// <summary>Create project</summary>
     [HttpPost]
     public async Task<ActionResult> CreateProject(CreateProjectParams createProjectParams)
     {
@@ -141,16 +149,16 @@ namespace Api.Controllers
       });
     }
 
-    [HttpPost("invite")]
-    public async Task<ActionResult> Invite(InviteToProjectParmas inviteToProjectParmas)
+    /// <summary>Invite user to project</summary>
+    [HttpPost("{id}/invite")]
+    public async Task<ActionResult> Invite(Guid id, InviteToProjectParmas inviteToProjectParmas)
     {
       var currentUser = GetUserFromContext();
-      var projectId = inviteToProjectParmas.ProjectId;
       var userIds = inviteToProjectParmas.UserIds;
 
       var project = await _projectRepository.Query()
         .Where(p => p.Creator == currentUser.Id)
-        .FirstOrDefaultAsync(p => p.Id == projectId);
+        .FirstOrDefaultAsync(p => p.Id == id);
 
       if (project == null)
       {
@@ -185,6 +193,7 @@ namespace Api.Controllers
       });
     }
 
+    /// <summary>Delete project</summary>
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteProject(Guid id)
     {

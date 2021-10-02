@@ -32,7 +32,7 @@ export const ListBoard: FC<IProps> = ({ project }) => {
 
   function handleCreateBoard(data: any) {
     const body = {
-      name: data.name,
+      title: data.name,
       background: data.background,
       projectId: project.id,
     };

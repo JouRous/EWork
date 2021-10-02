@@ -11,22 +11,13 @@ namespace Application.Mapper
     {
       CreateMap<Board, CreateBoardParams>().ReverseMap();
 
-      CreateMap<Board, BoardGetResult>()
-        .ForMember(dest => dest.Members, opt =>
-        {
-          opt.MapFrom(src => src.UserBoards.Select(x => x.User));
-        });
+      CreateMap<Board, BoardGetResult>();
 
       CreateMap<Board, BoardDetailDto>()
         .ForMember(dest => dest.Members, opt =>
         {
-          opt.MapFrom(src => src.UserBoards.Select(x => x.User));
+          opt.MapFrom(src => src.Project.UserProjects.Select(x => x.User));
         });
-      // .ForMember(dest => dest.Members, opt => 
-      // {
-      //   opt.MapFrom(src => src.)
-      // })
-
     }
   }
 }
