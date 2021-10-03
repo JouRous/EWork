@@ -231,13 +231,14 @@ const BoardPage: FC<any> = () => {
   }
 
   const closeTicketPopup = (ticket: ITicket) => {
-    const newBoard = { ...board };
-    const listInx = newBoard.lists.findIndex((x) => x.id === ticket.listId);
-    const ticketIndex = newBoard.lists[listInx].tickets.findIndex(
-      (x) => x.id === ticket.id
-    );
-    newBoard.lists[listInx].tickets[ticketIndex] = ticket;
-    setBoard(newBoard);
+    // const newBoard = { ...board };
+    // const listInx = newBoard.lists.findIndex((x) => x.id === ticket.listId);
+    // const ticketIndex = newBoard.lists[listInx].tickets.findIndex(
+    //   (x) => x.id === ticket.id
+    // );
+    // newBoard.lists[listInx].tickets[ticketIndex] = ticket;
+    // setBoard(newBoard);
+    setLoading(!loading);
   };
 
   return (

@@ -37,7 +37,7 @@ namespace Api.Controllers
       _commentRepository.Add(comment);
       await _commentRepository.SaveChangesAsync();
 
-      return Ok();
+      return Ok(comment);
     }
 
     /// <summary>Update comment</summary>

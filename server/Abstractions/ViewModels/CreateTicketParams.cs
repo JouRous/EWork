@@ -9,6 +9,5 @@ namespace Abstractions.ViewModels
     public string Description { get; set; } = "";
     public string Pos { get; set; }
     public Guid ListId { get; set; }
-    public ICollection<Guid> MemberIds { get; set; } = new List<Guid>();
   }
 }

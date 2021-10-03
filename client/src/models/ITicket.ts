@@ -1,3 +1,4 @@
+import { IComment } from './IComment';
 import { IMoveable } from './IMoveable';
 
 export interface ITicket extends IMoveable {
@@ -5,4 +6,5 @@ export interface ITicket extends IMoveable {
   title: string;
   description: string;
   listId: string;
+  comments: IComment[];
 }

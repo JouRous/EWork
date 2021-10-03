@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Abstractions.Entities;
 using Abstractions.ViewModels;
@@ -44,7 +45,7 @@ namespace Api.Controllers
     public async Task<ActionResult> Get(Guid id)
     {
       var ticket = await _ticketRepository.Query(t => t.Id == id)
-        .Include(t => t.Comments)
+        .Include(t => t.Comments.OrderBy(x => x.CreatedAt))
         .ProjectTo<TicketGetResult>(_mapper.ConfigurationProvider)
         .FirstOrDefaultAsync();
       return Ok(ticket);
@@ -64,6 +65,19 @@ namespace Api.Controllers
         StatusCode = 200,
         Message = "Success"
       });
+    }
+
+    /// <summary>Update Ticket</summary>
+    [HttpPut("{id}")]
+    public async Task<ActionResult> Update(Guid id, UpdateTicketParams body)
+    {
+      var ticket = await _ticketRepository.FirstOrDefaultAsync(id);
+      ticket.Description = body.Description;
+      ticket.Title = body.Title;
+      ticket.UpdatedAt = DateTime.Now;
+      await _listRepository.SaveChangesAsync();
+
+      return Ok();
     }
 
     /// <summary>Move ticket (Update pos)</summary>
@@ -107,6 +121,17 @@ namespace Api.Controllers
       await _listRepository.SaveChangesAsync();
 
       return Ok(ticket);
+    }
+
+    /// <summary>Delete ticket</summary>
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(Guid id)
+    {
+      var ticket = await _ticketRepository.FirstOrDefaultAsync(id);
+      _ticketRepository.Remove(ticket);
+      await _ticketRepository.SaveChangesAsync();
+
+      return Ok();
     }
   }
 }

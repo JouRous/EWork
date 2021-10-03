@@ -18,10 +18,16 @@ const path = <T>(path: string, data: any, options?: AxiosRequestConfig) => {
   return from(request);
 };
 
+const deleteR = <T>(path: string, options?: AxiosRequestConfig) => {
+  const request = axiosInstance.delete<T>(path, { ...options });
+  return from(request);
+};
+
 const http = {
   get,
   post,
   path,
+  deleteR,
 };
 
 export default http;
