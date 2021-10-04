@@ -52,5 +52,15 @@ namespace Api.Controllers
       return Ok(comment);
     }
 
+    /// <summary>Delete comment</summary>
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(Guid id)
+    {
+      var comment = await _commentRepository.FirstOrDefaultAsync(id);
+      _commentRepository.Remove(comment);
+      await _commentRepository.SaveChangesAsync();
+
+      return Ok();
+    }
   }
 }

@@ -21,7 +21,6 @@ export const CommentForm: FC<IProps> = ({ ticketId, addComment }) => {
   const currentUser = useAppSelector((state) => state.auth.user);
 
   const sendComment = (data: any) => {
-    console.log(data);
     http
       .post<IComment>(`/api/v1/comment`, {
         ticketId,

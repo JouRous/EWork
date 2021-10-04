@@ -84,12 +84,13 @@ export const TicketDetail: FC<IProps> = ({ closeTicketPopup }) => {
     console.log(data);
     http
       .path<ITicket>(`/api/v1/ticket/${ticket.id}/${field}`, data)
-      .subscribe((data) => {
-        setTicket(data.data);
+      .subscribe((response) => {
         if (field === 'title') {
+          setTicket({ ...ticket, title: response.data.title });
           setEditTitle(false);
         }
         if (field === 'description') {
+          setTicket({ ...ticket, description: response.data.description });
           setEditDescription(false);
         }
       });
@@ -111,6 +112,13 @@ export const TicketDetail: FC<IProps> = ({ closeTicketPopup }) => {
     const newTicket = { ...ticket };
     newTicket.comments.unshift(comment);
     setTicket(newTicket);
+  };
+
+  const deleteComment = (commentId: string) => {
+    http.deleteR(`/api/v1/comment/${commentId}`).subscribe((response) => {
+      const newComments = ticket.comments.filter((c) => c.id !== commentId);
+      setTicket({ ...ticket, comments: newComments });
+    });
   };
 
   if (!isOpen) {
@@ -275,6 +283,7 @@ export const TicketDetail: FC<IProps> = ({ closeTicketPopup }) => {
                           key={comment.id}
                           user={currentUser}
                           comment={comment}
+                          deleteComment={deleteComment}
                         />
                       ))}
                     </div>

@@ -45,7 +45,7 @@ namespace Api.Controllers
     public async Task<ActionResult> Get(Guid id)
     {
       var ticket = await _ticketRepository.Query(t => t.Id == id)
-        .Include(t => t.Comments.OrderBy(x => x.CreatedAt))
+        .Include(t => t.Comments.OrderByDescending(x => x.CreatedAt))
         .ProjectTo<TicketGetResult>(_mapper.ConfigurationProvider)
         .FirstOrDefaultAsync();
       return Ok(ticket);

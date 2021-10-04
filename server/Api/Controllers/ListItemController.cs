@@ -63,11 +63,7 @@ namespace Api.Controllers
       _listRepository.Add(list);
       await _listRepository.SaveChangesAsync();
 
-      return Ok(new
-      {
-        StatusCode = 200,
-        Message = "Success"
-      });
+      return Ok(list);
     }
 
     ///<summary>Move list (Update pos)</summary>
@@ -79,7 +75,17 @@ namespace Api.Controllers
 
       await _listRepository.SaveChangesAsync();
 
-      return Ok(moveListParams.Pos);
+      return Ok(list);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(Guid id)
+    {
+      var list = await _listRepository.FirstOrDefaultAsync(id);
+      _listRepository.Remove(list);
+      await _listRepository.SaveChangesAsync();
+
+      return Ok(list);
     }
   }
 }
