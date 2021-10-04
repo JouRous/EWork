@@ -1,5 +1,5 @@
 import { IComment } from 'models/IComment';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import Avatar from 'react-avatar';
 import moment from 'moment';
 
@@ -10,6 +10,8 @@ interface IProps {
 }
 
 export const Comment: FC<IProps> = ({ comment, user, deleteComment }) => {
+  const [edit, setEdit] = useState<boolean>(false);
+
   return (
     <div className="flex w-full my-3">
       <div
@@ -19,12 +21,18 @@ export const Comment: FC<IProps> = ({ comment, user, deleteComment }) => {
         <Avatar name={user.username} size="35" textSizeRatio={2.75} />
       </div>
       <div className="flex-1 ml-3">
-        <div className="font-semibold mb-2">
-          <span>{user.username}</span>
-          <span>{moment(comment.createdAt).fromNow()}</span>
+        <div className="flex items-center mb-2">
+          <span className="font-semibold mr-2">{user.username}</span>
+          <span style={{ color: '#5e6c84', fontSize: 12 }}>
+            {moment(comment.createdAt).fromNow()}
+          </span>
         </div>
-        <div className="bg-white px-3 py-2 shadow-md rounded">
-          {comment.content}
+        <div>
+          <input
+            className="bg-white px-3 py-2 shadow-md rounded w-full"
+            value={comment.content}
+            disabled={!edit}
+          />
         </div>
         <div>
           <button
@@ -33,7 +41,11 @@ export const Comment: FC<IProps> = ({ comment, user, deleteComment }) => {
           >
             Delete
           </button>
-          <button className="mx-2" style={{ color: '#5e6c84', fontSize: 12 }}>
+          <button
+            className="mx-2"
+            style={{ color: '#5e6c84', fontSize: 12 }}
+            onClick={() => setEdit(true)}
+          >
             Edit
           </button>
         </div>
