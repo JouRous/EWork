@@ -106,7 +106,7 @@ namespace Api.Controllers
     {
       var user = GetUserFromContext();
 
-      var users = await _projectRepository.Query()
+      var users = await _projectRepository.Query(x => x.Id == id)
         .Include(p => p.UserProjects)
         .Select(p => p.UserProjects)
         .FirstOrDefaultAsync();
