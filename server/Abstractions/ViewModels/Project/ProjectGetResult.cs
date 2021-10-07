@@ -7,6 +7,7 @@ namespace Abstractions.ViewModels
   {
     public string Name { get; set; }
     public string ShortDescription { get; set; }
+    public int MembersCount { get; set; }
     public List<Guid> BoardIds { get; set; }
   }
 }

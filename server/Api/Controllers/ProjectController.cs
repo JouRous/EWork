@@ -48,6 +48,7 @@ namespace Api.Controllers
 
       var projects = await _projectRepository
         .Query(p => p.Creator == user.Id)
+        .Include(p => p.UserProjects)
         .Include(p => p.Boards)
         .ToListAsync();
 
@@ -77,6 +78,26 @@ namespace Api.Controllers
     {
       var project = await _projectRepository.Query().Include(p => p.Boards).FirstOrDefaultAsync(p => p.Id == id);
       return Ok(project);
+    }
+
+    [HttpGet("{id}/members")]
+    public async Task<ActionResult> GetMembers(Guid id)
+    {
+      var members = await _projectRepository.Query(x => x.Id == id)
+        .Include(x => x.UserProjects)
+        .ThenInclude(x => x.User)
+        .Select(x => x.UserProjects.Select(x => x.User))
+        .FirstOrDefaultAsync();
+
+      return Ok(_mapper.Map<List<UserDetailDto>>(members));
+    }
+
+    /// <summary>Get Wiki</summary>
+    [HttpGet("{id}/wiki")]
+    public async Task<ActionResult> GetWiki(Guid id)
+    {
+      var project = await _projectRepository.FirstOrDefaultAsync(id);
+      return Ok(project.Wiki);
     }
 
     /// <summary>Get boards by project id</summary>

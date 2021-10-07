@@ -9,6 +9,7 @@ namespace Abstractions.Entities
   {
     public string Title { get; set; }
     public string Description { get; set; }
+    public int Priority { get; set; }
     public string Pos { get; set; }
     public Guid ListId { get; set; }
     public List List { get; set; }

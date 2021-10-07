@@ -12,7 +12,8 @@ namespace Application.Mapper
       CreateMap<Project, CreateProjectParams>().ReverseMap();
 
       CreateMap<Project, ProjectGetResult>()
-        .ForMember(src => src.BoardIds, opt => opt.MapFrom(src => src.Boards.Select(x => x.Id)));
+        .ForMember(src => src.BoardIds, opt => opt.MapFrom(src => src.Boards.Select(x => x.Id)))
+        .ForMember(src => src.MembersCount, opt => opt.MapFrom(src => src.UserProjects.Count()));
     }
   }
 }
