@@ -91,6 +91,7 @@ namespace Api.Controllers
     public async Task<ActionResult> Create(CreateBoardParams createBoardParams)
     {
       var board = _mapper.Map<Board>(createBoardParams);
+      board.IsPublic = true;
       _boardRepository.Add(board);
       await _boardRepository.SaveChangesAsync();
 
@@ -123,6 +124,20 @@ namespace Api.Controllers
     {
       var boardToDelete = await _boardRepository.FirstOrDefaultAsync(id);
       _boardRepository.Remove(boardToDelete);
+      await _boardRepository.SaveChangesAsync();
+
+      return Ok(new
+      {
+        StatusCode = 200,
+        Message = "Success"
+      });
+    }
+
+    [HttpPut("change-visibility/{id}")]
+    public async Task<ActionResult> ChangeVisibility(Guid id)
+    {
+      var boardToUpdate = await _boardRepository.FirstOrDefaultAsync(id);
+      boardToUpdate.IsPublic = !boardToUpdate.IsPublic;
       await _boardRepository.SaveChangesAsync();
 
       return Ok(new

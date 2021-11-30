@@ -14,11 +14,13 @@ namespace Api.Controllers
   public class SearchController : BaseController
   {
     private readonly IRepository<User> _userRepository;
+    private readonly IRepository<Board> _boardRepository;
     private readonly IMapper _mapper;
 
-    public SearchController(IRepository<User> userRepository, IMapper mapper)
+    public SearchController(IRepository<User> userRepository, IRepository<Board> boardRepository, IMapper mapper)
     {
       _userRepository = userRepository;
+      _boardRepository = boardRepository;
       _mapper = mapper;
     }
 
@@ -29,7 +31,7 @@ namespace Api.Controllers
 
       if (!string.IsNullOrEmpty(queryParams.Email))
       {
-        query = query.Where(u => u.Email.Contains(queryParams.Email));
+        query = query.Where(u => u.Email.ToLower().Contains(queryParams.Email.ToLower()));
       }
       else
       {
@@ -40,6 +42,25 @@ namespace Api.Controllers
         .ToListAsync();
 
       return Ok(userFound);
+    }
+
+    [HttpGet("board")]
+    public async Task<ActionResult> SearchBoard([FromQuery] BoardSearchParams searchParams)
+    {
+      var query = _boardRepository.Query().Where(b => b.IsPublic == true);
+
+      if (!string.IsNullOrEmpty(searchParams.Title))
+      {
+        query = query.Where(b => b.Title.ToLower().Contains(searchParams.Title.ToLower()));
+      }
+      else
+      {
+        return Ok(new List<Board>());
+      }
+
+      var boardFound = await query.ProjectTo<BoardDetailDto>(_mapper.ConfigurationProvider).ToListAsync();
+
+      return Ok(boardFound);
     }
   }
 }
