@@ -9,6 +9,7 @@ namespace Abstractions.Entities
   public class Board : BaseEntity
   {
     public string Title { get; set; }
+    public bool IsPublic { get; set; }
     public Guid ProjectId { get; set; }
     public Project Project { get; set; }
     public IList<List> Lists { get; set; }
