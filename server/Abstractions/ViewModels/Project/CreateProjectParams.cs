@@ -8,6 +8,6 @@ namespace Abstractions.ViewModels
   {
     public string Name { get; set; }
     public string ShortDescription { get; set; }
-    public string Wiki { get; set; }
+    // public string Wiki { get; set; }
   }
 }

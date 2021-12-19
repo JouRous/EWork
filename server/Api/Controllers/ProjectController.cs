@@ -169,6 +169,19 @@ namespace Api.Controllers
       });
     }
 
+    [HttpPost("{id}/wiki")]
+    public async Task<ActionResult> UpdateWiki(Guid id, UpdateWikiParams updateWikiParams)
+    {
+      var project = await _projectRepository.FirstOrDefaultAsync(id);
+      project.Wiki = updateWikiParams.Wiki;
+      await _projectRepository.SaveChangesAsync();
+      return Ok(new
+      {
+        StatusCode = 200,
+        Message = "Success"
+      });
+    }
+
     /// <summary>Invite user to project</summary>
     [HttpPost("{id}/invite")]
     public async Task<ActionResult> Invite(Guid id, InviteToProjectParmas inviteToProjectParmas)
