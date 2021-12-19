@@ -5,7 +5,6 @@ using Infrastructure.Models;
 
 namespace Abstractions.Entities
 {
-  // [BsonCollection("Boards")]
   public class Board : BaseEntity
   {
     public string Title { get; set; }

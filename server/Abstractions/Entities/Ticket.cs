@@ -4,7 +4,6 @@ using Infrastructure.Models;
 
 namespace Abstractions.Entities
 {
-  // [BsonCollection("Tickets")]
   public class Ticket : BaseEntity
   {
     public string Title { get; set; }

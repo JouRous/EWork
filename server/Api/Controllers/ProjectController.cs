@@ -12,7 +12,6 @@ using AutoMapper.QueryableExtensions;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
 namespace Api.Controllers
 {
   [AuthorizeAttribute]
