@@ -45,6 +45,8 @@ services:
     depends_on:
       - api
       # - web
+    #volumes:
+      #- ./nginx/:/etc/nginx/conf.d/:ro
     networks:
       - my-network
 
